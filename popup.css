@@ -1,0 +1,312 @@
+/*For saved prompts*/
+body {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: #9602c2;
+    overflow-y: hidden;
+}
+
+.main-content {
+    overflow-y: hidden;
+}
+
+
+.main-container {
+    text-align: center;
+    border: 2px solid gray;
+    padding: 30px;
+}
+
+.input {
+    padding: 30px;
+}
+
+#submit {
+    height: 40px;
+    width: 70px;
+}
+
+.container-2 {
+    text-align: center;
+    border: 2px solid gray;
+    padding: 30px;
+}
+
+
+.container {
+    width: 500px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(90.4deg, rgb(248, 52, 246) 0.6%, rgb(152, 38, 252) 90%);
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.content {
+    padding: 20px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+#addPromptButton {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(90.4deg, rgb(248, 52, 246) 0.6%, rgb(152, 38, 252) 90%);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    outline: none;
+}
+
+#addPromptButton:hover {
+    background-color: #9602c2;
+}
+
+.promptList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.promptItem {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    flex-direction: column;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.promptItem:last-child {
+    margin-bottom: 0;
+}
+
+.promptItem:hover {
+    background-color: #eaeaea;
+}
+
+.promptName {
+    font-weight: bold;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.copyButton:hover {
+    background-color: #9602c2;
+}
+
+.promptText {
+    color: #555;
+    margin-top: 10px;
+}
+
+.copyButton {
+    position: absolute;
+    top: 5px;
+    right: 45px;
+    /* Adjusted position */
+    background-color: #9602c2;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+}
+
+.categoriesButton {
+    position: absolute;
+    top: 5px;
+    background-color: #9602c2;
+    right: 85px;
+    /* Left as is */
+    background-color: "red";
+    color: "red";
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+}
+
+.deleteButton {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    /* Left as is */
+    background-color: #9602c2;
+    color: "red";
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px 10px;
+
+}
+
+/*Pre Made prompts collapsible*/
+.collapsible {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active,
+.collapsible:hover {
+    background-color: #ccc;
+}
+
+/* Style the collapsible content. Note: hidden by default */
+.content2 {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+    transition: max-height 0.2s ease-out;
+}
+
+.collapsible:after {
+    content: "\02795";
+    /* Unicode character for "plus" sign (+) */
+    font-size: 13px;
+    color: white;
+    float: right;
+    margin-left: 5px;
+}
+
+.active:after {
+    content: "\2796";
+    /* Unicode character for "minus" sign (-) */
+}
+
+button {
+    user-select: none;
+}
+
+details>summary span.icon {
+    width: 24px;
+    height: 24px;
+    transition: all 0.3s;
+    margin-left: auto;
+}
+
+details[open] summary span.icon {
+    transform: rotate(180deg);
+}
+
+summary {
+    display: flex;
+    cursor: pointer;
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+.DebuggingClass {
+    background-color: yellow;
+    border-radius: 5%;
+}
+
+.copyPreMadeButton {
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+footer {
+    background-color: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+footer p {
+    margin: 0;
+}
+
+footer img {
+    max-width: 25px;
+    margin-top: 5px;
+}
+
+.premadepromptCopy {
+    background-color: rgb(255, 255, 196);
+}
+
+.search-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 10px;
+}
+
+.input {
+    font-size: 1rem;
+}
+
+.auth-container {
+    margin-bottom: 20px;
+  }
+  
+  .auth-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  
+  .auth-container button {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(90.4deg, rgb(248, 52, 246) 0.6%, rgb(152, 38, 252) 90%);
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  
+  .auth-container button:hover {
+    background-color: #9602c2;
+  }

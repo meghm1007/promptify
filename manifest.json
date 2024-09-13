@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Promptify - Store and Access Your ChatGPT Prompts",
+  "version": "2.0.0",
+  "description": "Efficiently manage and use your ChatGPT prompts",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "logo (1).png",
+      "48": "logo (1).png",
+      "128": "logo (1).png"
+    }
+  },
+  "icons": {
+    "16": "logo (1).png",
+    "48": "logo (1).png",
+    "128": "logo (1).png"
+  }
+}
