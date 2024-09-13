@@ -12,9 +12,31 @@
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   z-index: 9999;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 #floating-button:hover {
   background-color: #7b01a0;
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+#floating-button-tooltip {
+  position: absolute;
+  bottom: 60px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  margin-bottom: 12px;
+}
+
+#floating-button:hover + #floating-button-tooltip {
+  opacity: 1;
 }
