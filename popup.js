@@ -219,29 +219,21 @@ function copyPrompt(promptTitle) {
 // Search bar functionality
 document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById("search");
-    const prompts = document.querySelectorAll(".premadeprompt");
+    const promptList = document.getElementById("promptList");
 
     searchInput.addEventListener("input", function() {
-        const searchTerm = searchInput.value.trim()
-            .toLowerCase();
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const promptItems = promptList.querySelectorAll(".promptItem");
 
-        let foundPrompts = 0;
+        promptItems.forEach(function(promptItem) {
+            const promptName = promptItem.querySelector(".promptName").textContent.toLowerCase();
+            const promptText = promptItem.querySelector(".promptText").textContent.toLowerCase();
 
-        prompts.forEach(function(prompt) {
-            const title = prompt
-                .querySelector(".titlePrompts")
-                .textContent.toLowerCase();
-            const promptCopy = prompt
-                .querySelector(".premadepromptCopy")
-                .textContent.toLowerCase();
-
-            if (title.includes(searchTerm) || promptCopy.includes(searchTerm)) {
-                prompt.style.display = "block";
-                foundPrompts++;
+            if (promptName.includes(searchTerm) || promptText.includes(searchTerm)) {
+                promptItem.style.display = "block";
             } else {
-                prompt.style.display = "none";
+                promptItem.style.display = "none";
             }
-            console.log("Found prompts:", foundPrompts);
         });
     });
 });
