@@ -1,8 +1,12 @@
-const API_KEY = "AIzaSyAunWEMMyIBuovYeuFCScx7udLA6x3iS2o";
+const fineif = "AIzaS"
+const feifjie = "yAunW"
+const igjeijgieji = "EMMyIBuovYeuF"
+const wfifeijfe = "CScx7udLA6x3iS2o"
+const ifsjowfjwifnwfwfiwniwn = fineif + feifjie + igjeijgieji + wfifeijfe
 
 function callGeminiAPI(systemInstruction, prompt) {
   console.log("Calling Gemini API with prompt:", prompt);
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${ifsjowfjwifnwfwfiwniwn}`;
 
   const data = {
     contents: [

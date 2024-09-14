@@ -19,13 +19,12 @@ document.body.appendChild(loadingText);
 
 // Function to get the appropriate textarea
 function getPromptTextarea() {
+  // Check for Perplexity's textarea
+  const perplexityTextarea = document.querySelector("textarea");
+  if (perplexityTextarea) return perplexityTextarea;
   // Check for ChatGPT's textarea
   const chatGPTTextarea = document.querySelector("#prompt-textarea");
   if (chatGPTTextarea) return chatGPTTextarea;
-
-  // Check for Perplexity's textarea
-  const perplexityTextarea = document.querySelectorAll("textarea")[0];
-  if (perplexityTextarea) return perplexityTextarea;
 
   // If neither is found, return null
   return null;
@@ -35,7 +34,7 @@ function getPromptTextarea() {
 floatingButton.addEventListener("click", () => {
   const promptTextarea = getPromptTextarea();
   if (promptTextarea) {
-    const promptText = promptTextarea.innerText.trim();
+    const promptText = promptTextarea.innerHTML;
     if (promptText) {
       // Show loading text and hide tooltip
       loadingText.style.display = "block";
@@ -51,7 +50,8 @@ floatingButton.addEventListener("click", () => {
           if (response.error) {
             alert("Error: " + response.error);
           } else {
-            promptTextarea.innerText = response.response;
+            console.log(response.response);
+            promptTextarea.innerHTML = response.response;
             // Trigger input event to ensure the UI updates
             promptTextarea.dispatchEvent(new Event("input", { bubbles: true }));
           }
