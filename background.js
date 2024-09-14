@@ -38,7 +38,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("Received message in background script:", request);
   if (request.action === "improvePrompt") {
     const systemInstruction =
-      "The user has provided this prompt for asking something to LLMs. Improve the prompt text for better results. Do not add any preamble or introduction. Just return the improved prompt. Even if the prompt is vague do not add additional information to it nor delete any information. ";
+      "The user has provided a prompt for querying LLMs. Create a prompt for the LLM in utmost detail in the format, you are an expert _____ and give details of the prompt. Just return the improved prompt. Only give the prompt and nothing else.";
+
     callGeminiAPI(systemInstruction, request.prompt)
       .then((response) => {
         console.log("Received response from Gemini API:", response);
