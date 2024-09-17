@@ -1,34 +1,46 @@
 {
-  "manifest_version": 3,
-  "name": "Promptify - Store and Access Your ChatGPT Prompts",
-  "version": "3.0.0",
-  "description": "Efficiently manage and use your ChatGPT prompts",
-  "permissions": ["storage", "activeTab"],
-  "host_permissions": [
-    "https://chat.openai.com/*",
-    "https://generativelanguage.googleapis.com/*"
-  ],
-  "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "logo (1).png",
-      "48": "logo (1).png",
-      "128": "logo (1).png"
+    "update_url": "https://clients2.google.com/service/update2/crx",
+    "manifest_version": 3,
+    "name": "Promptify - Personal Prompt Engineer and Manager",
+    "version": "3.0.2",
+    "description": "Improve your ChatGPT prompts in a single click. Store custom prompts and paste them in a single click.",
+    "permissions": [
+        "storage",
+        "activeTab"
+    ],
+    "host_permissions": [
+        "https://chat.openai.com/*",
+        "https://generativelanguage.googleapis.com/*"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "logo (1).png",
+            "48": "logo (1).png",
+            "128": "logo (1).png"
+        }
+    },
+    "icons": {
+        "16": "logo (1).png",
+        "48": "logo (1).png",
+        "128": "logo (1).png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://chat.openai.com/*",
+                "https://chatgpt.com/*"
+           
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "content.css"
+            ]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
     }
-  },
-  "icons": {
-    "16": "logo (1).png",
-    "48": "logo (1).png",
-    "128": "logo (1).png"
-  },
-  "content_scripts": [
-    {
-      "matches": ["https://chat.openai.com/*", "https://chatgpt.com/*", "https://www.perplexity.ai/*"],
-      "js": ["content.js"],
-      "css": ["content.css"]
-    }
-  ],
-  "background": {
-    "service_worker": "background.js"
-  }
 }

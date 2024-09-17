@@ -222,12 +222,15 @@ document.addEventListener("DOMContentLoaded", function() {
     const promptList = document.getElementById("promptList");
 
     searchInput.addEventListener("input", function() {
-        const searchTerm = searchInput.value.trim().toLowerCase();
+        const searchTerm = searchInput.value.trim()
+            .toLowerCase();
         const promptItems = promptList.querySelectorAll(".promptItem");
 
         promptItems.forEach(function(promptItem) {
-            const promptName = promptItem.querySelector(".promptName").textContent.toLowerCase();
-            const promptText = promptItem.querySelector(".promptText").textContent.toLowerCase();
+            const promptName = promptItem.querySelector(".promptName")
+                .textContent.toLowerCase();
+            const promptText = promptItem.querySelector(".promptText")
+                .textContent.toLowerCase();
 
             if (promptName.includes(searchTerm) || promptText.includes(searchTerm)) {
                 promptItem.style.display = "block";

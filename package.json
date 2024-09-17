@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@clerk/clerk-js": "^5.21.2",
+    "mellowtel": "^1.1.6"
+  }
+}

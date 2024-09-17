@@ -1,71 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <!-- vf -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Promptify</title>
     <link rel="stylesheet" href="popup.css" />
-  </head>
+</head>
 
-  <body>
+<body>
     <div class="main-content">
-      <div class="container">
-        <div class="header">
-          <h2>Promptify</h2>
-          <p>Your Personal Prompt Engineer and Prompt Manager🤖</p>
-          <p>(FREE for only a limited time)🕝</p>
-        </div>
-        <div class="content">
-          <div class="search-wrapper">
-            <input
-              placeholder="Search Prompts🔎"
-              type="search"
-              id="search"
-              data-search
-            />
-          </div>
-          <div id="promptContainer">
-            <input
-              type="text"
-              id="promptNameInput"
-              placeholder="Enter a name for your prompt"
-            />
-            <input
-              type="text"
-              id="promptInput"
-              placeholder="Enter your prompt"
-            />
-            <button type="button" class="addPrompt" id="addPromptButton">
-              Add Prompt
-            </button>
-          </div>
-          <div id="promptList"></div>
-          <div class="premade">
-            <div>
-              <h2>Pre-made Prompts coming soon😀...</h2>
-              <p>We are working on it</p>
+        <div class="container">
+            <div class="header">
+                <h2>Promptify</h2>
+                <p>Your Personal Prompt Engineer and Prompt Manager🤖</p>
+                <p>(FREE for only a limited time)🕝</p>
             </div>
-          </div>
+            <div class="content">
+                <div class="search-wrapper">
+                    <input placeholder="Search Prompts🔎" type="search" id="search" data-search />
+                </div>
+                <div id="promptContainer">
+                    <input type="text" id="promptNameInput" placeholder="Enter a name for your prompt" />
+                    <input type="text" id="promptInput" placeholder="Enter your prompt" />
+                    <button type="button" class="addPrompt" id="addPromptButton">
+                        Add Prompt
+                    </button>
+                </div>
+                <div id="promptList"></div>
+                <div class="premade">
+                    <div>
+                        <h2>Pre-made Prompts coming soon😀...</h2>
+                        <p>We are working on it</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <footer>
-      <p>
-        Enjoying Promptify? Consider supporting us with a coffee!<a
-          href="https://www.buymeacoffee.com/mehtamegha"
-          target="_blank"
-        >
-          <img
-            src="coffee-cup.png"
-            alt="Buy Me A Coffee"
-            style="max-width: 15px"
-          />
-        </a>
-      </p>
+        <p>
+            Enjoying Promptify? Consider supporting us with a coffee!<a href="https://www.buymeacoffee.com/mehtamegha" target="_blank">
+                <img src="coffee-cup.png" alt="Buy Me A Coffee" style="max-width: 15px" />
+            </a>
+        </p>
     </footer>
 
     <script src="popup.js"></script>
-  </body>
+</body>
+
 </html>

@@ -20,10 +20,10 @@ document.body.appendChild(loadingText);
 // Function to get the appropriate textarea
 function getPromptTextarea() {
   // Check for Perplexity's textarea
-  const perplexityTextarea = document.querySelector("textarea");
-  if (perplexityTextarea) return perplexityTextarea;
+  // const perplexityTextarea = document.querySelectorAll("textarea");
+  // if (perplexityTextarea) return perplexityTextarea;
   // Check for ChatGPT's textarea
-  const chatGPTTextarea = document.querySelector("#prompt-textarea");
+  const chatGPTTextarea = document.querySelectorAll("#prompt-textarea")[0];
   if (chatGPTTextarea) return chatGPTTextarea;
 
   // If neither is found, return null
@@ -34,14 +34,17 @@ function getPromptTextarea() {
 floatingButton.addEventListener("click", () => {
   const promptTextarea = getPromptTextarea();
   if (promptTextarea) {
-    const promptText = promptTextarea.innerHTML;
+    const promptText = promptTextarea.innerText;
     if (promptText) {
       // Show loading text and hide tooltip
       loadingText.style.display = "block";
       tooltip.style.display = "none";
 
       chrome.runtime.sendMessage(
-        { action: "improvePrompt", prompt: promptText },
+        {
+          action: "improvePrompt",
+          prompt: promptText,
+        },
         (response) => {
           // Hide loading text and show tooltip after response is received
           loadingText.style.display = "none";
@@ -51,9 +54,13 @@ floatingButton.addEventListener("click", () => {
             alert("Error: " + response.error);
           } else {
             console.log(response.response);
-            promptTextarea.innerHTML = response.response;
+            promptTextarea.innerText = response.response;
             // Trigger input event to ensure the UI updates
-            promptTextarea.dispatchEvent(new Event("input", { bubbles: true }));
+            promptTextarea.dispatchEvent(
+              new Event("input", {
+                bubbles: true,
+              })
+            );
           }
         }
       );
