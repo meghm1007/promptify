@@ -16,38 +16,53 @@
           <p>Your Personal Prompt Engineer and Prompt Manager🤖</p>
           <p>(FREE for only a limited time)🕝</p>
           <p>Create an account or login below...</p>
+          <div id="auth-message" class="auth-message"></div>
           <section class="setup-info">
             <div class="login-area" style="width: 50%">
               <h3>Login</h3>
               <div class="input-group">
-                <input type="text" placeholder="Email Address" />
+                <input
+                  type="text"
+                  id="login-email"
+                  placeholder="Email Address"
+                />
               </div>
               <div class="input-group">
-                <input type="password" placeholder="Password" />
+                <input
+                  type="password"
+                  id="login-password"
+                  placeholder="Password"
+                />
               </div>
               <div class="input-group">
-                <input type="button" value="Login" />
+                <input type="button" id="login-button" value="Login" />
               </div>
             </div>
             <div class="signup-area" style="width: 50%">
               <h3>Create Account</h3>
-
               <div class="input-group">
-                <input type="text" placeholder="Email Address" />
+                <input
+                  type="text"
+                  id="signup-email"
+                  placeholder="Email Address"
+                />
               </div>
               <div class="input-group">
-                <input type="password" placeholder="Password" />
+                <input
+                  type="password"
+                  id="signup-password"
+                  placeholder="Password"
+                />
               </div>
-
               <div class="input-group">
-                <input type="button" value="Signup" />
+                <input type="button" id="signup-button" value="Signup" />
               </div>
             </div>
           </section>
           <section class="logged-in" style="display: none">
             <h3>Logged In Area</h3>
-            <button>Log Out</button>
-            <p>User Details:</p>
+            <button id="logout-button">Log Out</button>
+            <p id="user-details">User Details:</p>
           </section>
         </div>
         <div class="content">
