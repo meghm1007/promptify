@@ -1,3 +1,92 @@
+//***misc functions
+const pageDisplay = function(userAuth){
+    //console.log(userAuth)
+    if(userAuth == false || userAuth.data == false){
+      //not logged in
+      document.querySelector('section.logged-in').style.display='none';
+      document.querySelector('section.logged-out').style.display='block';
+    }else{
+      var userAuthObj = userAuth.data;
+      //is logged in
+      document.querySelector('section.logged-out').style.display='none';
+      document.querySelector('section.logged-in').style.display='block';
+      document.querySelector('section.logged-in p').innerHTML='User UID: '+userAuthObj.uid+'<br />'
+      +'User Details: <pre>'+JSON.stringify(userAuthObj.providerData, undefined, 2)+'</pre>'
+      +'User Obj: <pre>'+JSON.stringify(userAuth.userObj)+'</pre>';
+    }
+  }
+  
+  //Global Vars example...
+  window.signupUser = false;
+  window.signupE = '';
+  window.signupP = '';
+  
+  
+  
+  //***send messages
+  chrome.runtime.sendMessage({command: "user-auth"}, (response) => {
+    //console.log(response);
+    pageDisplay(response);
+  });
+  
+  //***listen for messages
+  chrome.runtime.onMessage.addListener((msg, sender, resp) => {
+    console.log(msg);
+  
+  
+    if(msg.command == 'stripeCardOnConfirm'){
+      //complete user signup / with stripe token
+      console.log(window.signupUser,window.signupE,window.signupP);
+      console.log('get stripe token info', msg);
+      //send to background page to create user and complete payment
+      chrome.runtime.sendMessage({command: "auth-signup", e: window.signupE, p: window.signupP, s:msg.token, tokenId: msg.token.id}, (response) => {
+        pageDisplay(response);
+      });
+    }
+    if(msg.command == 'stripeCardOnConfirmError'){
+      //error with stripe token
+      console.log('error with card info', msg);
+    }
+  });
+  
+  
+  
+  
+  //***create events
+  
+  //logout button
+  document.querySelector('.logged-in button').addEventListener('click',function(){
+    chrome.runtime.sendMessage({command: "auth-logout"}, (response) => {
+      pageDisplay(false);
+    });
+  });
+  
+  //signup user
+  document.querySelector('.signup-area input[type="button"]').addEventListener('click', function(){
+    var email = document.querySelector('.signup-area input[type="text"]').value;
+    var pass = document.querySelector('.signup-area input[type="password"]').value;
+    window.signupUser = true;
+    window.signupE = email;
+    window.signupP = pass;
+    //complete event in stripeCardOnConfirm
+    console.log('send to service worker [signup] ->', email, pass);
+    //generate stripe token
+    chrome.runtime.sendMessage({command: "submitStripeCard"},(response) => {
+        //now listen for events...
+    });
+  });
+  
+  document.querySelector('.login-area input[type="button"]').addEventListener('click', function(){
+    var email = document.querySelector('.login-area input[type="text"]').value;
+    var pass = document.querySelector('.login-area input[type="password"]').value;
+    console.log('send to service worker [login] ->', email, pass);
+    chrome.runtime.sendMessage({command: "auth-login", e: email, p: pass}, (response) => {
+      pageDisplay(response);
+    });
+  });
+  
+
+
 preMadeText = document.getElementsByClassName("premadepromptCopy");
 copyButtonsNode = document.querySelectorAll(".copyPreMadeButton");
 titlePrompts = document.querySelectorAll(".titlePrompts");
