@@ -1,108 +1,130 @@
+// Tab switching functionality
+document.addEventListener("DOMContentLoaded", () => {
+  const tabs = document.querySelectorAll(".auth-tab");
+  const forms = document.querySelectorAll(".auth-form");
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const targetForm = tab.dataset.tab;
+
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      forms.forEach((form) => {
+        form.style.display =
+          form.id === `${targetForm}-form` ? "block" : "none";
+      });
+    });
+  });
+});
+
 // Page display function
 const pageDisplay = function (userAuth) {
-  const authMessage = document.getElementById('auth-message');
-  const loggedOutSection = document.querySelector('section.setup-info');
-  const loggedInSection = document.querySelector('section.logged-in');
-  const userDetails = document.getElementById('user-details');
+  const authMessage = document.getElementById("auth-message");
+  const authSection = document.querySelector(".auth-section");
+  const loggedInSection = document.querySelector(".logged-in");
+  const userNameSpan = document.getElementById("user-name");
 
-  authMessage.textContent = '';
-  authMessage.className = 'auth-message';
+  authMessage.textContent = "";
+  authMessage.className = "auth-message";
 
-  if (userAuth == false || userAuth.data == false) {
-    loggedOutSection.style.display = 'block';
-    loggedInSection.style.display = 'none';
+  if (!userAuth || !userAuth.data) {
+    authSection.style.display = "block";
+    loggedInSection.style.display = "none";
   } else {
-    var userAuthObj = userAuth.data;
-    loggedOutSection.style.display = 'none';
-    loggedInSection.style.display = 'block';
-    userDetails.innerHTML = 'User UID: ' + userAuthObj.uid + '<br />' +
-      'User Details: <pre>' + JSON.stringify(userAuthObj.providerData, undefined, 2) + '</pre>' +
-      'User Obj: <pre>' + JSON.stringify(userAuth.userObj) + '</pre>';
-    
-    authMessage.textContent = 'Successfully logged in!';
-    authMessage.classList.add('success');
+    const userAuthObj = userAuth.data;
+    authSection.style.display = "none";
+    loggedInSection.style.display = "block";
+
+    // Display user email (commented out to address the issue)
+    // const userEmail = userAuthObj.providerData[0].email;
+    // userNameSpan.textContent = userEmail;
+
+    authMessage.textContent = "Successfully logged in!";
+    authMessage.classList.add("success");
   }
 };
 
-// Send message to check user auth status
+// Check user auth status on load
 chrome.runtime.sendMessage({ command: "user-auth" }, (response) => {
   pageDisplay(response);
 });
 
 // Event listeners
-document.addEventListener('DOMContentLoaded', function () {
-    
-  const authMessage = document.getElementById('auth-message');
+document.addEventListener("DOMContentLoaded", function () {
+  const authMessage = document.getElementById("auth-message");
 
   // Logout button
-  document.getElementById('logout-button').addEventListener('click', function () {
-    chrome.runtime.sendMessage({ command: 'auth-logout' }, (response) => {
-      pageDisplay(false);
-      authMessage.textContent = 'Successfully logged out!';
-      authMessage.className = 'auth-message success';
+  document
+    .getElementById("logout-button")
+    .addEventListener("click", function () {
+      chrome.runtime.sendMessage({ command: "auth-logout" }, () => {
+        pageDisplay(false);
+        authMessage.textContent = "Successfully logged out!";
+        authMessage.className = "auth-message success";
+      });
     });
-  });
 
   // Signup user
-  document.getElementById('signup-button').addEventListener('click', function () {
-    var email = document.getElementById('signup-email').value;
-    var pass = document.getElementById('signup-password').value;
-    console.log('send to service worker [signup] ->', email, pass);
-    chrome.runtime.sendMessage({ command: 'auth-signup', e: email, p: pass }, (response) => {
-      if (response.status === 'error') {
-        authMessage.textContent = response.message || 'Signup failed. Please try again.';
-        authMessage.className = 'auth-message error';
-      } else {
-        pageDisplay(response);
-      }
+  document
+    .getElementById("signup-button")
+    .addEventListener("click", function () {
+      const email = document.getElementById("signup-email").value;
+      const pass = document.getElementById("signup-password").value;
+      chrome.runtime.sendMessage(
+        { command: "auth-signup", e: email, p: pass },
+        (response) => {
+          if (response.status === "error") {
+            authMessage.textContent =
+              response.message || "Signup failed. Please try again.";
+            authMessage.className = "auth-message error";
+          } else {
+            pageDisplay(response);
+          }
+        }
+      );
     });
-  });
 
   // Login user
-  document.getElementById('login-button').addEventListener('click', function () {
-    var email = document.getElementById('login-email').value;
-    var pass = document.getElementById('login-password').value;
-    console.log('send to service worker [login] ->', email, pass);
-    chrome.runtime.sendMessage({ command: 'auth-login', e: email, p: pass }, (response) => {
-      if (response.status === 'error') {
-        authMessage.textContent = 'Invalid email or password. Please try again.';
-        authMessage.className = 'auth-message error';
-      } else {
-        pageDisplay(response);
-      }
+  document
+    .getElementById("login-button")
+    .addEventListener("click", function () {
+      const email = document.getElementById("login-email").value;
+      const pass = document.getElementById("login-password").value;
+      chrome.runtime.sendMessage(
+        { command: "auth-login", e: email, p: pass },
+        (response) => {
+          if (response.status === "error") {
+            authMessage.textContent =
+              "Invalid email or password. Please try again.";
+            authMessage.className = "auth-message error";
+          } else {
+            pageDisplay(response);
+          }
+        }
+      );
     });
-  });
 
-  // ... (keep the rest of your existing code for prompt management, search, etc.)
-});
+  // Prompt management functionality
+  const promptNameInput = document.getElementById("promptNameInput");
+  const promptInput = document.getElementById("promptInput");
+  const addPromptButton = document.getElementById("addPromptButton");
+  const promptList = document.getElementById("promptList");
+  const searchInput = document.querySelector("[data-search]");
 
-// ... (keep the rest of your existing code for prompt management, search, etc.)
+  let counter = 0;
 
-preMadeText = document.getElementsByClassName("premadepromptCopy");
-copyButtonsNode = document.querySelectorAll(".copyPreMadeButton");
-titlePrompts = document.querySelectorAll(".titlePrompts");
+  // Load pre-made prompts
+  const preMadeText = document.getElementsByClassName("premadepromptCopy");
+  const copyButtonsNode = document.querySelectorAll(".copyPreMadeButton");
+  const titlePrompts = document.querySelectorAll(".titlePrompts");
 
-const promptNameInput = document.getElementById("promptNameInput");
-const promptInput = document.getElementById("promptInput");
-const addPromptButton = document.getElementById("addPromptButton");
-const promptList = document.getElementById("promptList");
-const searchInput = document.querySelector("[data-search]");
+  const promptTextArray = Array.from(preMadeText).map((el) =>
+    el.textContent.replace(/\n/g, "").trim()
+  );
+  const promptTitleArray = Array.from(titlePrompts).map((el) => el.innerText);
 
-let counter = 0;
-
-document.addEventListener("DOMContentLoaded", function () {
-  promptTextArray = [];
-  promptTitleArray = [];
-  for (let i = 0; i < preMadeText.length; i++) {
-    promptTextArray.push(preMadeText[i].textContent);
-    promptTitleArray.push(titlePrompts[i].innerText);
-  }
-  var cleanedPromptTextArray = promptTextArray.map(function (promptText) {
-    return promptText.replace(/\n/g, "").trim();
-  });
-  console.log(cleanedPromptTextArray); // Array of all the prompts
-  console.log(promptTitleArray); // Array of all the titles
-
+  // Add prompt functionality
   addPromptButton.addEventListener("click", function () {
     const promptName = promptNameInput.value.trim();
     const promptText = promptInput.value.trim();
@@ -113,226 +135,181 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     addPrompt(promptName, promptText);
-    savePrompt(promptName, promptText); // Save prompt to local storage
+    savePrompt(promptName, promptText);
     promptNameInput.value = "";
     promptInput.value = "";
   });
 
-  loadPrompts(); // Load saved prompts when the page loads
-});
+  loadPrompts();
 
-function addPrompt(promptName, promptText) {
-  proSavedItems();
-  counter += 1;
-  const promptItem = document.createElement("div");
-  const promptItemID = "promptItem" + counter;
-  promptItem.id = promptItemID;
-  promptItem.className = "promptItem";
+  // Prompt item management functions
+  function addPrompt(promptName, promptText) {
+    proSavedItems();
+    counter++;
+    const promptItem = createPromptItem(promptName, promptText);
+    promptList.appendChild(promptItem);
+  }
 
-  const promptNameElement = document.createElement("span");
-  promptNameElement.textContent = promptName;
-  promptNameElement.className = "promptName";
-  promptItem.appendChild(promptNameElement);
+  function createPromptItem(promptName, promptText) {
+    const promptItem = document.createElement("div");
+    promptItem.id = `promptItem${counter}`;
+    promptItem.className = "promptItem";
 
-  const promptTextElement = document.createElement("span");
-  promptTextElement.textContent = promptText;
-  promptTextElement.className = "promptText";
-  promptItem.appendChild(promptTextElement);
+    const promptNameElement = document.createElement("span");
+    promptNameElement.textContent = promptName;
+    promptNameElement.className = "promptName";
 
-  const copyButton = document.createElement("button");
-  copyButton.textContent = "🗒️";
-  copyButton.className = "copyButton";
-  copyButton.addEventListener("click", function () {
-    copyToClipboard(promptText);
-  });
+    const promptTextElement = document.createElement("span");
+    promptTextElement.textContent = promptText;
+    promptTextElement.className = "promptText";
 
-  const deleteButton = document.createElement("button");
-  deleteButton.textContent = "🗑️";
-  deleteButton.className = "deleteButton";
-  deleteButton.addEventListener("click", function () {
-    counter -= 1;
-    promptItem.remove();
-    removePromptFromLocalStorage(promptName);
-  });
+    const copyButton = createButton("🗒️", "copyButton", () =>
+      copyToClipboard(promptText)
+    );
+    const deleteButton = createButton("🗑️", "deleteButton", () => {
+      counter--;
+      promptItem.remove();
+      removePromptFromLocalStorage(promptName);
+    });
+    const categoriesButton = createButton("📂", "categoriesButton");
 
-  const categoriesButton = document.createElement("button");
-  categoriesButton.textContent = "📂";
-  categoriesButton.className = "categoriesButton";
+    promptItem.append(
+      promptNameElement,
+      promptTextElement,
+      categoriesButton,
+      copyButton,
+      deleteButton
+    );
+    return promptItem;
+  }
 
-  promptItem.appendChild(categoriesButton);
-  promptItem.appendChild(copyButton);
-  promptItem.appendChild(deleteButton);
+  function createButton(text, className, clickHandler) {
+    const button = document.createElement("button");
+    button.textContent = text;
+    button.className = className;
+    if (clickHandler) button.addEventListener("click", clickHandler);
+    return button;
+  }
 
-  promptList.appendChild(promptItem);
-}
+  // Clipboard and notification functions
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      showNotification("Prompt Copied");
+    });
+  }
 
-function copyToClipboard(text) {
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  document.body.removeChild(textarea);
-
-  // Create notification container
-  const notification = document.createElement("div");
-  notification.textContent = "Prompt Copied";
-  notification.style.position = "fixed";
-  notification.style.top = "50%";
-  notification.style.left = "50%";
-  notification.style.transform = "translate(-50%, -50%)";
-  notification.style.backgroundColor = "#f3f3f3";
-  notification.style.border = "1px solid #ccc";
-  notification.style.padding = "10px 20px";
-  notification.style.borderRadius = "5px";
-  notification.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.1)";
-  notification.style.opacity = "0"; // Initially invisible
-
-  // Append notification container to body
-  document.body.appendChild(notification);
-
-  // Fade in animation
-  notification.style.transition = "opacity 0.5s ease-in-out";
-  setTimeout(() => {
-    notification.style.opacity = "1";
-  }, 10);
-
-  // Automatically remove the notification after 2 seconds
-  setTimeout(() => {
-    notification.style.opacity = "0"; // Fade out
-    setTimeout(() => {
-      document.body.removeChild(notification);
-    }, 500); // Wait for fade out animation to complete
-  }, 2000);
-}
-
-function proSavedItems() {
-  let countStoredItems = document.querySelectorAll(".promptItem").length;
-  const addPromptButtonClass = document.querySelectorAll(".addPrompt")[0];
-  if (countStoredItems > 9) {
+  function showNotification(message) {
     const notification = document.createElement("div");
-    notification.textContent = "Limit Reached";
-    notification.style.position = "fixed";
-    notification.style.top = "50%";
-    notification.style.left = "50%";
-    notification.style.transform = "translate(-50%, -50%)";
-    notification.style.backgroundColor = "#f3f3f3";
-    notification.style.border = "1px solid #ccc";
-    notification.style.padding = "10px 20px";
-    notification.style.borderRadius = "5px";
-    notification.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.1)";
-    notification.style.opacity = "0"; // Initially invisible
+    notification.textContent = message;
+    notification.style.cssText = `
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background-color: #f3f3f3; border: 1px solid #ccc; padding: 10px 20px;
+      border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    `;
 
-    // Append notification container to body
     document.body.appendChild(notification);
 
-    // Fade in animation
-    notification.style.transition = "opacity 0.5s ease-in-out";
     setTimeout(() => {
       notification.style.opacity = "1";
-    }, 10);
-
-    // Automatically remove the notification after 2 seconds
-    setTimeout(() => {
-      notification.style.opacity = "0"; // Fade out
       setTimeout(() => {
-        document.body.removeChild(notification);
-      }, 500); // Wait for fade out animation to complete
-    }, 2000);
-
-    addPromptButtonClass.disabled = true;
-    addPromptButtonClass.style.backgroundColor = "grey";
-    addPromptButtonClass.style.cursor = "not-allowed";
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 500);
+      }, 2000);
+    }, 10);
   }
-}
 
-function savePrompt(promptName, promptText) {
-  // Retrieve existing prompts from local storage
-  let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
-  // Add the new prompt
-  prompts.push({
-    name: promptName,
-    text: promptText,
+  // Local storage functions
+  function savePrompt(promptName, promptText) {
+    let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+    prompts.push({ name: promptName, text: promptText });
+    localStorage.setItem("prompts", JSON.stringify(prompts));
+  }
+
+  function loadPrompts() {
+    const savedPrompts = JSON.parse(localStorage.getItem("prompts")) || [];
+    savedPrompts.forEach((prompt) => addPrompt(prompt.name, prompt.text));
+  }
+
+  function removePromptFromLocalStorage(promptName) {
+    let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+    prompts = prompts.filter((prompt) => prompt.name !== promptName);
+    localStorage.setItem("prompts", JSON.stringify(prompts));
+  }
+
+  // Pro feature limit
+  function proSavedItems() {
+    const countStoredItems = document.querySelectorAll(".promptItem").length;
+    const addPromptButtonClass = document.querySelector(".addPrompt");
+    if (countStoredItems > 9) {
+      showNotification("Limit Reached");
+      addPromptButtonClass.disabled = true;
+      addPromptButtonClass.style.backgroundColor = "grey";
+      addPromptButtonClass.style.cursor = "not-allowed";
+    }
+  }
+
+  // Pre-made prompts copy functionality
+  copyButtonsNode.forEach((button, index) => {
+    button.addEventListener("click", () =>
+      copyToClipboard(preMadeText[index].textContent)
+    );
   });
-  // Store the updated prompts back to local storage
-  localStorage.setItem("prompts", JSON.stringify(prompts));
-}
 
-function loadPrompts() {
-  // Retrieve saved prompts from local storage
-  const savedPrompts = JSON.parse(localStorage.getItem("prompts")) || [];
-  // Add each saved prompt to the DOM
-  savedPrompts.forEach((prompt) => {
-    addPrompt(prompt.name, prompt.text);
-  });
-}
-
-function removePromptFromLocalStorage(promptName) {
-  let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
-  // Filter out the prompt with the specified name
-  prompts = prompts.filter((prompt) => prompt.name !== promptName);
-  // Update local storage with the filtered prompts
-  localStorage.setItem("prompts", JSON.stringify(prompts));
-}
-
-for (let i = 0; i < preMadeText.length; i++) {
-  copyButtonsNode[i].addEventListener("click", function () {
-    copyToClipboard(preMadeText[i].textContent);
-  });
-}
-
-function copyPrompt(promptTitle) {
-  // Find the prompt with the given title
-  const prompt = document.querySelector(
-    `.premadeprompt summary:contains('${promptTitle}')`
-  ).parentNode;
-
-  // Clone the prompt and append it to the prompt list
-  const clonedPrompt = prompt.cloneNode(true);
-  document.getElementById("promptList").appendChild(clonedPrompt);
-}
-
-// Search bar functionality
-document.addEventListener("DOMContentLoaded", function () {
-  const searchInput = document.getElementById("search");
-  const promptList = document.getElementById("promptList");
-
+  // Search functionality
   searchInput.addEventListener("input", function () {
-    const searchTerm = searchInput.value.trim().toLowerCase();
+    const searchTerm = this.value.trim().toLowerCase();
     const promptItems = promptList.querySelectorAll(".promptItem");
 
-    promptItems.forEach(function (promptItem) {
+    promptItems.forEach((promptItem) => {
       const promptName = promptItem
         .querySelector(".promptName")
         .textContent.toLowerCase();
       const promptText = promptItem
         .querySelector(".promptText")
         .textContent.toLowerCase();
-
-      if (promptName.includes(searchTerm) || promptText.includes(searchTerm)) {
-        promptItem.style.display = "block";
-      } else {
-        promptItem.style.display = "none";
-      }
+      promptItem.style.display =
+        promptName.includes(searchTerm) || promptText.includes(searchTerm)
+          ? "block"
+          : "none";
     });
   });
-});
 
-//Categorize
-document.addEventListener("DOMContentLoaded", function () {
-  // Function to update the color in both UI and local storage
+  // Categorize functionality
+  document.addEventListener("click", function (event) {
+    if (event.target.classList.contains("categoriesButton")) {
+      const promptItem = event.target.closest(".promptItem");
+      const bgBefore = window.getComputedStyle(promptItem).backgroundColor;
+
+      const colorCycle = [
+        "rgba(255, 0, 0, 0.4)",
+        "rgba(0, 255, 0, 0.4)",
+        "rgba(0, 0, 255, 0.4)",
+        "rgba(255, 255, 0, 0.4)",
+      ];
+
+      let newColor;
+      if (
+        bgBefore === "rgb(249, 249, 249)" ||
+        bgBefore === "rgb(234, 234, 234)"
+      ) {
+        newColor = colorCycle[0];
+      } else {
+        const currentIndex = colorCycle.indexOf(bgBefore);
+        newColor = colorCycle[(currentIndex + 1) % colorCycle.length];
+      }
+
+      updateColor(promptItem, newColor);
+    }
+  });
+
   function updateColor(promptItem, newColor) {
-    // Update UI
     promptItem.style.backgroundColor = newColor;
-    // Update local storage for this prompt item
     localStorage.setItem(promptItem.id, newColor);
   }
 
-  // Function to retrieve colors from local storage on page load
   function retrieveColorsFromLocalStorage() {
-    // Get all prompt items
-    const promptItems = document.querySelectorAll(".promptItem");
-    promptItems.forEach((promptItem) => {
+    document.querySelectorAll(".promptItem").forEach((promptItem) => {
       const storedColor = localStorage.getItem(promptItem.id);
       if (storedColor) {
         promptItem.style.backgroundColor = storedColor;
@@ -340,40 +317,5 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Call the function to retrieve colors from local storage on page load
   retrieveColorsFromLocalStorage();
-
-  // Add event listener to the document to listen for clicks on folder buttons
-  document.addEventListener("click", function (event) {
-    // Check if the clicked element is a folder button
-    if (event.target.classList.contains("categoriesButton")) {
-      // Get the parent prompt item of the clicked folder button
-      const promptItem = event.target.closest(".promptItem");
-
-      // Get the computed background color
-      const bgBefore = window.getComputedStyle(promptItem).backgroundColor;
-
-      console.log(bgBefore); // Output the background color
-
-      // Change the background color of the parent prompt item
-      let newColor;
-      if (
-        bgBefore === "rgb(249, 249, 249)" ||
-        bgBefore === "rgb(234, 234, 234)"
-      ) {
-        newColor = "rgba(255, 0, 0, 0.4)";
-      } else if (bgBefore === "rgba(255, 0, 0, 0.4)") {
-        newColor = "rgba(0, 255, 0, 0.4)";
-      } else if (bgBefore === "rgba(0, 255, 0, 0.4)") {
-        newColor = "rgba(0, 0, 255, 0.4)";
-      } else if (bgBefore === "rgba(0, 0, 255, 0.4)") {
-        newColor = "rgba(255, 255, 0, 0.4)";
-      } else if (bgBefore === "rgba(255, 255, 0, 0.4)") {
-        newColor = "rgba(255, 0, 0, 0.4)";
-      }
-
-      // Update the color
-      updateColor(promptItem, newColor);
-    }
-  });
 });

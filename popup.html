@@ -17,52 +17,28 @@
           <p>(FREE for only a limited time)🕝</p>
           <p>Create an account or login below...</p>
           <div id="auth-message" class="auth-message"></div>
-          <section class="setup-info">
-            <div class="login-area" style="width: 50%">
-              <h3>Login</h3>
-              <div class="input-group">
-                <input
-                  type="text"
-                  id="login-email"
-                  placeholder="Email Address"
-                />
-              </div>
-              <div class="input-group">
-                <input
-                  type="password"
-                  id="login-password"
-                  placeholder="Password"
-                />
-              </div>
-              <div class="input-group">
-                <input type="button" id="login-button" value="Login" />
-              </div>
+          <section class="auth-section">
+            <div class="auth-tabs">
+              <button class="auth-tab active" data-tab="login">Login</button>
+              <button class="auth-tab" data-tab="signup">Sign Up</button>
             </div>
-            <div class="signup-area" style="width: 50%">
-              <h3>Create Account</h3>
-              <div class="input-group">
-                <input
-                  type="text"
-                  id="signup-email"
-                  placeholder="Email Address"
-                />
-              </div>
-              <div class="input-group">
-                <input
-                  type="password"
-                  id="signup-password"
-                  placeholder="Password"
-                />
-              </div>
-              <div class="input-group">
-                <input type="button" id="signup-button" value="Signup" />
-              </div>
+            
+            <div class="auth-form" id="login-form">
+              <input type="email" id="login-email" placeholder="Email Address" required>
+              <input type="password" id="login-password" placeholder="Password" required>
+              <button id="login-button">Login</button>
+            </div>
+            
+            <div class="auth-form" id="signup-form" style="display: none;">
+              <input type="email" id="signup-email" placeholder="Email Address" required>
+              <input type="password" id="signup-password" placeholder="Password" required>
+              <button id="signup-button">Sign Up</button>
             </div>
           </section>
           <section class="logged-in" style="display: none">
-            <h3>Logged In Area</h3>
+            <p>Wohoo, you're signed in, happy prompting! <span id="user-name"></span></p>
             <button id="logout-button">Log Out</button>
-            <p id="user-details">User Details:</p>
+            <p id="user-details" style="display: none;"></p>
           </section>
         </div>
         <div class="content">
