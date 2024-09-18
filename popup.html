@@ -15,32 +15,53 @@
           <h2>Promptify</h2>
           <p>Your Personal Prompt Engineer and Prompt Manager🤖</p>
           <p>(FREE for only a limited time)🕝</p>
-          <p>Create an account or login below...</p>
-          <div id="auth-message" class="auth-message"></div>
-          <section class="auth-section">
-            <div class="auth-tabs">
-              <button class="auth-tab active" data-tab="login">Login</button>
-              <button class="auth-tab" data-tab="signup">Sign Up</button>
-            </div>
-            
-            <div class="auth-form" id="login-form">
-              <input type="email" id="login-email" placeholder="Email Address" required>
-              <input type="password" id="login-password" placeholder="Password" required>
-              <button id="login-button">Login</button>
-            </div>
-            
-            <div class="auth-form" id="signup-form" style="display: none;">
-              <input type="email" id="signup-email" placeholder="Email Address" required>
-              <input type="password" id="signup-password" placeholder="Password" required>
-              <button id="signup-button">Sign Up</button>
-            </div>
-          </section>
-          <section class="logged-in" style="display: none">
-            <p>Wohoo, you're signed in, happy prompting! <span id="user-name"></span></p>
-            <button id="logout-button">Log Out</button>
-            <p id="user-details" style="display: none;"></p>
-          </section>
         </div>
+
+        <section class="auth-section">
+          <p>Create an account or login below...</p>
+          <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Login</button>
+            <button class="auth-tab" data-tab="signup">Sign Up</button>
+          </div>
+
+          <div class="auth-form" id="login-form">
+            <input
+              type="email"
+              id="login-email"
+              placeholder="Email Address"
+              required
+            />
+            <input
+              type="password"
+              id="login-password"
+              placeholder="Password"
+              required
+            />
+            <button id="login-button">Login</button>
+          </div>
+
+          <div class="auth-form" id="signup-form" style="display: none">
+            <input
+              type="email"
+              id="signup-email"
+              placeholder="Email Address"
+              required
+            />
+            <input
+              type="password"
+              id="signup-password"
+              placeholder="Password"
+              required
+            />
+            <button id="signup-button">Sign Up</button>
+          </div>
+        </section>
+
+        <section class="logged-in" style="display: none">
+          <p>Signed in</p>
+          <button id="logout-button">Log Out</button>
+        </section>
+
         <div class="content">
           <div class="search-wrapper">
             <input

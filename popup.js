@@ -1,4 +1,3 @@
-// Tab switching functionality
 document.addEventListener("DOMContentLoaded", () => {
   const tabs = document.querySelectorAll(".auth-tab");
   const forms = document.querySelectorAll(".auth-form");
@@ -18,30 +17,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Page display function
+// Simplified page display function
 const pageDisplay = function (userAuth) {
-  const authMessage = document.getElementById("auth-message");
+  console.log("pageDisplay called with:", userAuth); // Debug log
+
   const authSection = document.querySelector(".auth-section");
   const loggedInSection = document.querySelector(".logged-in");
-  const userNameSpan = document.getElementById("user-name");
 
-  authMessage.textContent = "";
-  authMessage.className = "auth-message";
-
-  if (!userAuth || !userAuth.data) {
+  if (!userAuth || !userAuth.user) {
+    console.log("User not authenticated"); // Debug log
     authSection.style.display = "block";
     loggedInSection.style.display = "none";
   } else {
-    const userAuthObj = userAuth.data;
+    console.log("User authenticated:", userAuth.user); // Debug log
     authSection.style.display = "none";
     loggedInSection.style.display = "block";
-
-    // Display user email (commented out to address the issue)
-    // const userEmail = userAuthObj.providerData[0].email;
-    // userNameSpan.textContent = userEmail;
-
-    authMessage.textContent = "Successfully logged in!";
-    authMessage.classList.add("success");
   }
 };
 
@@ -52,37 +42,13 @@ chrome.runtime.sendMessage({ command: "user-auth" }, (response) => {
 
 // Event listeners
 document.addEventListener("DOMContentLoaded", function () {
-  const authMessage = document.getElementById("auth-message");
-
   // Logout button
   document
     .getElementById("logout-button")
     .addEventListener("click", function () {
       chrome.runtime.sendMessage({ command: "auth-logout" }, () => {
         pageDisplay(false);
-        authMessage.textContent = "Successfully logged out!";
-        authMessage.className = "auth-message success";
       });
-    });
-
-  // Signup user
-  document
-    .getElementById("signup-button")
-    .addEventListener("click", function () {
-      const email = document.getElementById("signup-email").value;
-      const pass = document.getElementById("signup-password").value;
-      chrome.runtime.sendMessage(
-        { command: "auth-signup", e: email, p: pass },
-        (response) => {
-          if (response.status === "error") {
-            authMessage.textContent =
-              response.message || "Signup failed. Please try again.";
-            authMessage.className = "auth-message error";
-          } else {
-            pageDisplay(response);
-          }
-        }
-      );
     });
 
   // Login user
@@ -94,16 +60,36 @@ document.addEventListener("DOMContentLoaded", function () {
       chrome.runtime.sendMessage(
         { command: "auth-login", e: email, p: pass },
         (response) => {
-          if (response.status === "error") {
-            authMessage.textContent =
-              "Invalid email or password. Please try again.";
-            authMessage.className = "auth-message error";
-          } else {
+          console.log("Login response:", response); // Debug log
+          if (response.status === "success") {
             pageDisplay(response);
+          } else {
+            alert("Login failed. Please try again.");
           }
         }
       );
     });
+
+  // Signup user
+  document
+    .getElementById("signup-button")
+    .addEventListener("click", function () {
+      const email = document.getElementById("signup-email").value;
+      const pass = document.getElementById("signup-password").value;
+      chrome.runtime.sendMessage(
+        { command: "auth-signup", e: email, p: pass },
+        (response) => {
+          console.log("Signup response:", response); // Debug log
+          if (response.status === "success") {
+            pageDisplay(response);
+          } else {
+            alert("Signup failed. Please try again.");
+          }
+        }
+      );
+    });
+
+  //PROMPTING SECTION AFTER THIS, AUTHENTICATION IS DONE ABOVE
 
   // Prompt management functionality
   const promptNameInput = document.getElementById("promptNameInput");

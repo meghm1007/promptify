@@ -95,7 +95,11 @@ try {
               resp({
                 type: "result",
                 status: "success",
-                data: user,
+                user: {
+                  uid: user.uid,
+                  email: user.email,
+                  // Add any other user properties you want to send
+                },
                 userObj: snapshot.val(),
               });
             });
@@ -104,7 +108,6 @@ try {
           resp({
             type: "result",
             status: "error",
-            data: false,
             message: error.message,
           });
         });
@@ -129,16 +132,19 @@ try {
               resp({
                 type: "result",
                 status: "success",
-                data: user,
+                user: {
+                  uid: user.uid,
+                  email: user.email,
+                  // Add any other user properties you want to send
+                },
                 userObj: { email: user.email },
               });
             });
         })
         .catch(function (error) {
           resp({
-            type: "signup",
+            type: "result",
             status: "error",
-            data: false,
             message: error.message,
           });
         });
