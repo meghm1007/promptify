@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Promptify</title>
     <link rel="stylesheet" href="popup.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   </head>
 
   <body>
@@ -13,84 +14,166 @@
       <div class="container">
         <div class="header">
           <h2>Promptify</h2>
-          <p>Your Personal Prompt Engineer and Prompt Manager🤖</p>
-          <p>(FREE for only a limited time)🕝</p>
+          <p>Your Personal Prompt Manager & Enhancer</p>
         </div>
 
-        <section class="auth-section">
-          <p>Create an account or login below...</p>
-          <div class="auth-tabs">
-            <button class="auth-tab active" data-tab="login">Login</button>
-            <button class="auth-tab" data-tab="signup">Sign Up</button>
+        <div class="tabs-container">
+          <div class="tabs">
+            <button class="tab active" data-tab="prompts">My Prompts</button>
+            <button class="tab" data-tab="folders">Folders</button>
+            <button class="tab" data-tab="socials">Socials</button>
+            <button class="tab" data-tab="settings">Settings</button>
           </div>
+        </div>
 
-          <div class="auth-form" id="login-form">
-            <input
-              type="email"
-              id="login-email"
-              placeholder="Email Address"
-              required
-            />
-            <input
-              type="password"
-              id="login-password"
-              placeholder="Password"
-              required
-            />
-            <button id="login-button">Login</button>
-          </div>
-
-          <div class="auth-form" id="signup-form" style="display: none">
-            <input
-              type="email"
-              id="signup-email"
-              placeholder="Email Address"
-              required
-            />
-            <input
-              type="password"
-              id="signup-password"
-              placeholder="Password"
-              required
-            />
-            <button id="signup-button">Sign Up</button>
-          </div>
-        </section>
-
-        <section class="logged-in" style="display: none">
-          <p>Signed in</p>
-          <button id="logout-button">Log Out</button>
-        </section>
-
-        <div class="content">
+        <!-- Prompts Tab -->
+        <div class="tab-content active" id="prompts-tab">
           <div class="search-wrapper">
             <input
-              placeholder="Search Prompts🔎"
+              placeholder="Search Prompts 🔎"
               type="search"
               id="search"
               data-search
             />
+            <select id="folderFilter">
+              <option value="all">All Folders</option>
+            </select>
           </div>
+          
+          <div class="sort-controls">
+            <select id="sortSelect">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="name">Name (A-Z)</option>
+              <option value="nameDesc">Name (Z-A)</option>
+              <option value="mostUsed">Most Used</option>
+              <option value="folder">By Folder</option>
+            </select>
+          </div>
+          
           <div id="promptContainer">
             <input
               type="text"
               id="promptNameInput"
               placeholder="Enter a name for your prompt"
             />
-            <input
-              type="text"
+            <textarea
               id="promptInput"
               placeholder="Enter your prompt"
-            />
-            <button type="button" class="addPrompt" id="addPromptButton">
-              Add Prompt
-            </button>
+              rows="3"
+            ></textarea>
+            <div class="prompt-options">
+              <select id="promptFolderSelect">
+                <option value="default">Default</option>
+              </select>
+              <button type="button" class="addPrompt" id="addPromptButton">
+                Add Prompt
+              </button>
+            </div>
           </div>
+          
+          <div id="promptCountInfo">
+            <span id="promptCount">0</span>/50 prompts saved
+          </div>
+          
           <div id="promptList"></div>
-          <div class="premade">
-            <div>
-              <h2>Pre-made Prompts coming soon😀...</h2>
-              <p>We are working on it</p>
+        </div>
+
+        <!-- Folders Tab -->
+        <div class="tab-content" id="folders-tab">
+          <div id="folderContainer">
+            <input
+              type="text"
+              id="folderNameInput"
+              placeholder="New folder name"
+            />
+            <div class="color-picker">
+              <span>Color:</span>
+              <div class="color-options">
+                <span class="color-option" data-color="#FF5151" style="background-color: #FF5151;"></span>
+                <span class="color-option" data-color="#FFA451" style="background-color: #FFA451;"></span>
+                <span class="color-option" data-color="#FFD951" style="background-color: #FFD951;"></span>
+                <span class="color-option" data-color="#A1FF51" style="background-color: #A1FF51;"></span>
+                <span class="color-option" data-color="#51FFC0" style="background-color: #51FFC0;"></span>
+                <span class="color-option" data-color="#51A1FF" style="background-color: #51A1FF;"></span>
+                <span class="color-option" data-color="#C051FF" style="background-color: #C051FF;"></span>
+                <span class="color-option" data-color="#FF51D5" style="background-color: #FF51D5;"></span>
+              </div>
+            </div>
+            <button type="button" id="addFolderButton">Add Folder</button>
+          </div>
+          <div id="folderList"></div>
+        </div>
+        
+        <!-- Socials Tab -->
+        <div class="tab-content" id="socials-tab">
+          <div class="social-links-container">
+            <h3>Your Social Links</h3>
+            <p>Store your social media profiles for easy access. These don't count toward your prompt limit.</p>
+            
+            <div class="social-link-item">
+              <div class="social-platform"><i class="fab fa-twitter" style="color: #1DA1F2;"></i></div>
+              <input type="text" class="social-link-input" id="twitter-link" placeholder="Your Twitter/X URL">
+              <button class="save-social-btn" data-platform="twitter">Save</button>
+            </div>
+            
+            <div class="social-link-item">
+              <div class="social-platform"><i class="fab fa-linkedin" style="color: #0A66C2;"></i></div>
+              <input type="text" class="social-link-input" id="linkedin-link" placeholder="Your LinkedIn URL">
+              <button class="save-social-btn" data-platform="linkedin">Save</button>
+            </div>
+            
+            <div class="social-link-item">
+              <div class="social-platform"><i class="fab fa-github" style="color: #333333;"></i></div>
+              <input type="text" class="social-link-input" id="github-link" placeholder="Your GitHub URL">
+              <button class="save-social-btn" data-platform="github">Save</button>
+            </div>
+            
+            <div class="social-link-item">
+              <div class="social-platform"><i class="fab fa-youtube" style="color: #FF0000;"></i></div>
+              <input type="text" class="social-link-input" id="youtube-link" placeholder="Your YouTube URL">
+              <button class="save-social-btn" data-platform="youtube">Save</button>
+            </div>
+            
+            <div class="social-link-item">
+              <div class="social-platform"><i class="fas fa-globe" style="color: #4285F4;"></i></div>
+              <input type="text" class="social-link-input" id="website-link" placeholder="Your personal website URL">
+              <button class="save-social-btn" data-platform="website">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+          <div class="settings-section">
+            <h3>Prompt Enhancement</h3>
+            <div class="toggle-container">
+              <label for="enableEnhancer">Enable prompt enhancement feature</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="enableEnhancer" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <p>When enabled, the enhancement button will appear on supported AI platforms to improve your prompts.</p>
+            
+            <h3>About Promptify</h3>
+            <p>Version 4.0.0</p>
+            <p>A tool to manage and enhance your prompts for AI platforms like ChatGPT, Claude, Perplexity, and more.</p>
+            
+            <h3>Features</h3>
+            <ul>
+              <li>Store up to 50 custom prompts</li>
+              <li>Organize prompts into colored folders</li>
+              <li>Enhance your prompts with AI</li>
+              <li>Keep track of your social media profiles</li>
+              <li>Works with multiple AI platforms</li>
+            </ul>
+            
+            <h3>Backup & Restore</h3>
+            <div class="backup-controls">
+              <button id="exportData">Export Data</button>
+              <button id="importData">Import Data</button>
+              <input type="file" id="importFile" style="display: none;">
             </div>
           </div>
         </div>
@@ -99,19 +182,14 @@
 
     <footer>
       <p>
-        Enjoying Promptify? Consider supporting us with a coffee!<a
-          href="https://www.buymeacoffee.com/mehtamegha"
-          target="_blank"
-        >
-          <img
-            src="coffee-cup.png"
-            alt="Buy Me A Coffee"
-            style="max-width: 15px"
-          />
+        Enjoying Promptify? Consider supporting us with a coffee!
+        <a href="https://www.buymeacoffee.com/mehtamegha" target="_blank">
+          <img src="coffee-cup.png" alt="Buy Me A Coffee" style="max-width: 15px" />
         </a>
       </p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

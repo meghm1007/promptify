@@ -1,416 +1,851 @@
-/*For saved prompts*/
+/* Base Styles */
 body {
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f3f4f6;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    background-color: #9602c2;
-
+    background-color: #f8f9fa;
+    color: #333;
 }
 
 .main-content {
-    overflow-y: hidden;
-}
-
-
-.main-container {
-    text-align: center;
-    border: 2px solid gray;
-    padding: 30px;
-}
-
-.input {
-    padding: 30px;
-}
-
-#submit {
-    height: 40px;
-    width: 70px;
-}
-
-.container-2 {
-    text-align: center;
-    border: 2px solid gray;
-    padding: 30px;
-}
-
-
-.container {
-    width: 500px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    width: 420px;
+    max-height: 550px;
     overflow: hidden;
 }
 
+.container {
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 550px;
+}
+
+/* Header Styles */
 .header {
-    background: linear-gradient(90.4deg, rgb(248, 52, 246) 0.6%, rgb(152, 38, 252) 90%);
+    background: linear-gradient(135deg, #6964FF, #8D60FF);
     color: #ffffff;
-    padding: 20px;
+    padding: 16px 20px;
     text-align: center;
-    border-radius: 10px 10px 0 0;
 }
 
 .header h2 {
     margin: 0;
-    font-size: 20px;
+    font-size: 24px;
+    font-weight: 700;
 }
 
-.content {
-    padding: 20px;
+.header p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    opacity: 0.95;
 }
 
-input[type="text"] {
+/* Tab Navigation */
+.tabs-container {
+    background-color: #ffffff;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px 0;
+    text-align: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #888;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+    color: #6964FF;
+}
+
+.tab.active {
+    color: #6964FF;
+    border-bottom: 2px solid #6964FF;
+    background-color: rgba(105, 100, 255, 0.05);
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+    padding: 16px;
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Prompt Input Area */
+#promptContainer {
+    background-color: #f7f7ff;
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #ebebff;
+}
+
+#promptNameInput {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+#promptNameInput:focus, #promptInput:focus, #folderNameInput:focus {
     outline: none;
+    border-color: #6964FF;
+    box-shadow: 0 0 0 2px rgba(105, 100, 255, 0.1);
+}
+
+#promptInput {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s;
+}
+
+.prompt-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+#promptFolderSelect, #sortSelect {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+#promptFolderSelect:focus, #sortSelect:focus, #folderFilter:focus, #search:focus {
+    outline: none;
+    border-color: #6964FF;
 }
 
 #addPromptButton {
-    width: 100%;
-    padding: 10px;
-    background: linear-gradient(90.4deg, rgb(248, 52, 246) 0.6%, rgb(152, 38, 252) 90%);
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #6964FF, #8D60FF);
     color: #ffffff;
     border: none;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    outline: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 #addPromptButton:hover {
-    background-color: #9602c2;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(105, 100, 255, 0.2);
 }
 
-.promptList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+#addPromptButton.disabled {
+    background: #c2c2c2;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Search and Filter */
+.search-wrapper {
+    display: flex;
+    margin-bottom: 16px;
+    gap: 10px;
+}
+
+#search {
+    flex: 2;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: white;
+}
+
+#folderFilter {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: white;
+}
+
+/* Sorting Controls */
+.sort-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+#sortSelect {
+    width: 160px;
+}
+
+/* Prompt Counter */
+#promptCountInfo {
+    text-align: right;
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 12px;
+}
+
+#promptCount {
+    font-weight: 600;
+    color: #6964FF;
+}
+
+/* Prompt List */
+#promptList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .promptItem {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    flex-direction: column;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    padding: 10px;
+    background-color: #ffffff;
+    border: 1px solid #eee;
+    border-left: 4px solid #ccc;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
     position: relative;
-    transition: background-color 0.3s ease;
-}
-
-.promptItem:last-child {
-    margin-bottom: 0;
 }
 
 .promptItem:hover {
-    background-color: #eaeaea;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.prompt-drag-handle {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ccc;
+    cursor: grab;
+    font-size: 16px;
+    display: none;
+}
+
+.promptItem:hover .prompt-drag-handle {
+    display: block;
+}
+
+.prompt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .promptName {
-    font-weight: bold;
-    display: inline-block;
-    margin-right: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
 }
 
-.copyButton:hover {
-    background-color: #9602c2;
+.folder-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    color: white;
+    font-weight: 500;
 }
 
 .promptText {
+    font-size: 14px;
     color: #555;
-    margin-top: 10px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+    word-break: break-word;
+    max-height: 100px;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
-.copyButton {
-    position: absolute;
-    top: 5px;
-    right: 45px;
-    /* Adjusted position */
-    background-color: #9602c2;
+.promptText::-webkit-scrollbar {
+    width: 4px;
+}
+
+.promptText::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 4px;
+}
+
+/* Prompt Action Buttons */
+.prompt-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.copyButton, .editButton, .folderButton, .deleteButton {
+    background: none;
+    border: none;
+    color: #777;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+
+.copyButton:hover {
+    color: #2196F3;
+    background-color: rgba(33, 150, 243, 0.08);
+}
+
+.editButton:hover {
+    color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.08);
+}
+
+.folderButton:hover {
+    color: #FF9800;
+    background-color: rgba(255, 152, 0, 0.08);
+}
+
+.deleteButton:hover {
+    color: #F44336;
+    background-color: rgba(244, 67, 54, 0.08);
+}
+
+/* Folder Tab */
+#folderContainer {
+    background-color: #f7f7ff;
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #ebebff;
+}
+
+#folderNameInput {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.color-picker {
+    margin-bottom: 16px;
+}
+
+.color-picker span {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+}
+
+.color-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.color-option {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border: 2px solid #333;
+    transform: scale(1.1);
+}
+
+#addFolderButton {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #6964FF, #8D60FF);
     color: #ffffff;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    padding: 5px 10px;
-    transition: background-color 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
-.categoriesButton {
+#addFolderButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(105, 100, 255, 0.2);
+}
+
+#folderList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.folder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-left: 4px solid #808080;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.folder-drag-handle {
     position: absolute;
-    top: 5px;
-    background-color: #9602c2;
-    right: 85px;
-    /* Left as is */
-    background-color: "red";
-    color: "red";
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: background-color 0.3s ease;
-}
-
-.deleteButton {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    /* Left as is */
-    background-color: #9602c2;
-    color: "red";
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    padding: 5px 10px;
-
-}
-
-/*Pre Made prompts collapsible*/
-.collapsible {
-    background-color: #eee;
-    color: #444;
-    cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    border: none;
-    text-align: left;
-    outline: none;
-    font-size: 15px;
-}
-
-/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-.active,
-.collapsible:hover {
-    background-color: #ccc;
-}
-
-/* Style the collapsible content. Note: hidden by default */
-.content2 {
-    padding: 0 18px;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ccc;
+    cursor: grab;
+    font-size: 16px;
     display: none;
-    overflow: hidden;
-    background-color: #f1f1f1;
-    transition: max-height 0.2s ease-out;
 }
 
-.collapsible:after {
-    content: "\02795";
-    /* Unicode character for "plus" sign (+) */
-    font-size: 13px;
-    color: white;
-    float: right;
+.folder-item:hover .folder-drag-handle {
+    display: block;
+}
+
+.folder-item:hover {
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.folder-name {
+    font-weight: 500;
+    color: #333;
     margin-left: 5px;
 }
 
-.active:after {
-    content: "\2796";
-    /* Unicode character for "minus" sign (-) */
+.folder-count {
+    background-color: #f0f0f0;
+    color: #555;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
 }
 
-button {
-    user-select: none;
-}
-
-details>summary span.icon {
-    width: 24px;
-    height: 24px;
-    transition: all 0.3s;
-    margin-left: auto;
-}
-
-details[open] summary span.icon {
-    transform: rotate(180deg);
-}
-
-summary {
-    display: flex;
-    cursor: pointer;
-}
-
-summary::-webkit-details-marker {
-    display: none;
-}
-
-.DebuggingClass {
-    background-color: yellow;
-    border-radius: 5%;
-}
-
-.copyPreMadeButton {
+.delete-folder-btn {
+    background: none;
     border: none;
-    border-radius: 5px;
+    color: #999;
+    font-size: 16px;
     cursor: pointer;
+    padding: 0 5px;
+    margin-right: 5px;
+    transition: color 0.15s;
 }
 
-footer {
-    background-color: #2c3e50;
-    color: white;
-    text-align: center;
-    padding: 10px;
+.delete-folder-btn:hover {
+    color: #F44336;
+}
+
+/* Folder Menu */
+.folder-menu {
     position: fixed;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    width: 200px;
+    z-index: 1000;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.folder-menu-header {
+    padding: 12px;
+    font-size: 14px;
+    color: #666;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+}
+
+.folder-menu-item {
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.folder-menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+.folder-menu-item.active {
+    background-color: rgba(105, 100, 255, 0.08);
+    font-weight: 500;
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Edit Modal */
+.edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.edit-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.edit-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.close-modal {
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.15s;
+}
+
+.close-modal:hover {
+    color: #F44336;
+}
+
+.edit-modal-content input,
+.edit-modal-content textarea {
     width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.edit-modal-content input:focus,
+.edit-modal-content textarea:focus {
+    outline: none;
+    border-color: #6964FF;
+    box-shadow: 0 0 0 2px rgba(105, 100, 255, 0.1);
+}
+
+.edit-modal-content select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+    background-color: white;
+}
+
+.edit-modal-content button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #6964FF, #8D60FF);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.edit-modal-content button:hover {
+    box-shadow: 0 4px 8px rgba(105, 100, 255, 0.2);
+}
+
+/* Settings Tab */
+.settings-section {
+    padding: 10px 0;
+}
+
+.settings-section h3 {
+    font-size: 16px;
+    color: #333;
+    margin: 18px 0 10px;
+}
+
+.settings-section p {
+    font-size: 14px;
+    color: #666;
+    margin: 5px 0;
+    line-height: 1.5;
+}
+
+.settings-section ul {
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+.settings-section li {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 0;
+}
+
+.toggle-container label {
+    font-size: 14px;
+    color: #555;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: #6964FF;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.backup-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.backup-controls button {
+    flex: 1;
+    padding: 12px;
+    background: linear-gradient(135deg, #6964FF, #8D60FF);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.backup-controls button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(105, 100, 255, 0.2);
+}
+
+/* Social Links Section */
+.social-links-container {
+    background-color: #f7f7ff;
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #ebebff;
+}
+
+.social-link-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.social-platform {
+    font-size: 20px;
+    width: 30px;
+    text-align: center;
+}
+
+.social-link-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 13px;
+    transition: border 0.2s;
+}
+
+.social-link-input:focus {
+    outline: none;
+    border-color: #6964FF;
+}
+
+.save-social-btn {
+    background: linear-gradient(135deg, #6964FF, #8D60FF);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.save-social-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(105, 100, 255, 0.2);
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.notification.success {
+    background: linear-gradient(to right, #43A047, #2E7D32);
+}
+
+.notification.error {
+    background: linear-gradient(to right, #E53935, #C62828);
+}
+
+/* Footer */
+footer {
+    width: 100%;
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 12px;
+    font-size: 12px;
+    color: #777;
+    border-top: 1px solid #eee;
 }
 
 footer p {
     margin: 0;
-}
-
-footer img {
-    max-width: 25px;
-    margin-top: 5px;
-}
-
-.premadepromptCopy {
-    background-color: rgb(255, 255, 196);
-}
-
-.search-wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    margin-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 
-.input {
-    font-size: 1rem;
+footer a {
+    color: #6964FF;
+    text-decoration: none;
+    transition: color 0.2s;
 }
 
-.auth-container {
-    margin-bottom: 20px;
-}
-
-.auth-container input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.auth-container button {
-    width: 100%;
-    padding: 10px;
-    background: linear-gradient(90.4deg, rgb(248, 52, 246) 0.6%, rgb(152, 38, 252) 90%);
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-.auth-container button:hover {
-    background-color: #9602c2;
-}
-.auth-message {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    text-align: center;
-    font-weight: bold;
-}
-
-.auth-message.error {
-    background-color: #ffebee;
-    color: #c62828;
-    border: 1px solid #ef9a9a;
-}
-
-.auth-message.success {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-    border: 1px solid #a5d6a7;
-}
-
-/* Auth Section Styles */
-.auth-section {
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.auth-tabs {
-    display: flex;
-    margin-bottom: 20px;
-}
-
-.auth-tab {
-    flex: 1;
-    background: none;
-    border: none;
-    padding: 10px;
-    font-size: 16px;
-    color: black;
-    cursor: pointer;    
-    transition: all 0.3s ease;
-}
-
-.auth-tab.active {
-    color: #9602c2;
-    border-bottom: 2px solid #9602c2;
-}
-
-.auth-form input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.auth-form button {
-    width: 100%;
-    padding: 10px;
-    background: linear-gradient(90deg, #f834f6, #9826fc);
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.auth-form button:hover {
-    background: linear-gradient(90deg, #9826fc, #f834f6);
-}
-
-/* Logged In Section Styles */
-.logged-in {
-    background-color: none;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-}
-
-.logged-in h3 {
-    color: #9602c2;
-    margin-bottom: 10px;
-}
-
-#logout-button {
-    background: linear-gradient(90deg, #f834f6, #9826fc);
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 20px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-#logout-button:hover {
-    background: linear-gradient(90deg, #9826fc, #f834f6);
-}
-#login-button, #signup-button {
-    background: black;
-    color: white;
+footer a:hover {
+    color: #8D60FF;
 }
