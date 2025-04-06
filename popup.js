@@ -6,9 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const promptInput = document.getElementById("promptInput");
   const addPromptButton = document.getElementById("addPromptButton");
   const promptList = document.getElementById("promptList");
-  const searchInput = document.querySelector("[data-search]");
-  const folderFilter = document.getElementById("folderFilter");
-  const promptFolderSelect = document.getElementById("promptFolderSelect");
   const folderNameInput = document.getElementById("folderNameInput");
   const addFolderButton = document.getElementById("addFolderButton");
   const folderList = document.getElementById("folderList");
@@ -17,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const exportDataBtn = document.getElementById("exportData");
   const importDataBtn = document.getElementById("importData");
   const importFileInput = document.getElementById("importFile");
-  const sortSelect = document.getElementById("sortSelect");
   const enableEnhancerToggle = document.getElementById("enableEnhancer");
   const socialSaveButtons = document.querySelectorAll(".save-social-btn");
 
@@ -25,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedColor = "#51A1FF"; // Default color
   let prompts = [];
   let folders = [{ name: "Default", color: "#808080", id: "default" }];
-  let nextPromptId = 1;
   let socialLinks = {
     twitter: "",
     linkedin: "",
@@ -54,70 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // =====================
-  // Drag & Drop Reordering
-  // =====================
-  function initSortable() {
-    // Make prompt list sortable
-    const promptSortable = new Sortable(promptList, {
-      animation: 150,
-      handle: '.prompt-drag-handle',
-      ghostClass: 'sortable-ghost',
-      onEnd: function(evt) {
-        // Update order in the prompts array when items are moved
-        const items = Array.from(promptList.querySelectorAll('.promptItem'));
-        const reorderedPrompts = [];
-        
-        items.forEach(item => {
-          const promptId = parseInt(item.dataset.id);
-          const prompt = prompts.find(p => p.id === promptId);
-          if (prompt) {
-            reorderedPrompts.push(prompt);
-          }
-        });
-        
-        prompts = reorderedPrompts;
-        savePrompts();
-      }
-    });
-    
-    // Make folder list sortable
-    const folderSortable = new Sortable(folderList, {
-      animation: 150,
-      handle: '.folder-drag-handle',
-      ghostClass: 'sortable-ghost',
-      filter: '.default-folder', // Default folder can't be moved
-      onEnd: function(evt) {
-        // Skip if the default folder was attempted to be moved
-        if (evt.item.classList.contains('default-folder')) return;
-        
-        // Update order in the folders array when items are moved
-        const items = Array.from(folderList.querySelectorAll('.folder-item'));
-        const reorderedFolders = [];
-        
-        // Always keep default first
-        const defaultFolder = folders.find(f => f.id === "default");
-        if (defaultFolder) {
-          reorderedFolders.push(defaultFolder);
-        }
-        
-        // Add other folders in the new order
-        items.forEach(item => {
-          if (item.dataset.folder === "default") return;
-          
-          const folderId = item.dataset.folder;
-          const folder = folders.find(f => f.id === folderId);
-          if (folder) {
-            reorderedFolders.push(folder);
-          }
-        });
-        
-        folders = reorderedFolders;
-        saveFolders();
-      }
-    });
-  }
-
-  // =====================
   // Enhancement Toggle
   // =====================
   // Load the current setting for the enhancer
@@ -130,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Listen for changes to the toggle
   enableEnhancerToggle.addEventListener('change', function() {
     chrome.storage.local.set({ enhancerEnabled: this.checked });
-    showNotification(this.checked ? "Enhancement enabled" : "Enhancement disabled");
+    showNotification(this.checked ? "Enhancement enabled" : "Enhancement disabled", "success");
   });
 
   // =====================
@@ -166,6 +97,34 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+  
+  // Add copy buttons for social links
+  function addCopyButtonsToSocialLinks() {
+    document.querySelectorAll('.social-link-item').forEach(item => {
+      const platform = item.querySelector('.save-social-btn').dataset.platform;
+      const input = item.querySelector('.social-link-input');
+      
+      // Check if copy button already exists
+      if (!item.querySelector('.copy-social-btn')) {
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-social-btn';
+        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+        copyBtn.title = `Copy ${platform} link`;
+        
+        copyBtn.addEventListener('click', () => {
+          if (input.value.trim()) {
+            navigator.clipboard.writeText(input.value.trim());
+            showNotification(`${platform.charAt(0).toUpperCase() + platform.slice(1)} link copied`, "success");
+          } else {
+            showNotification(`No ${platform} link to copy`, "error");
+          }
+        });
+        
+        // Insert before save button
+        item.insertBefore(copyBtn, item.querySelector('.save-social-btn'));
+      }
+    });
+  }
 
   // =====================
   // Folder Management
@@ -201,14 +160,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const newFolder = {
       id: folderId,
       name: folderName,
-      color: selectedColor,
-      order: folders.length // Add order property
+      color: selectedColor
     };
 
     folders.push(newFolder);
     saveFolders();
     createFolderElement(newFolder);
-    updateFolderSelects();
     folderNameInput.value = "";
     
     showNotification("Folder added", "success");
@@ -223,13 +180,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     folderItem.dataset.folder = folder.id;
     folderItem.style.borderLeftColor = folder.color;
-
-    // Add drag handle for reordering (except for default)
-    if (folder.id !== "default") {
-      const dragHandle = document.createElement("i");
-      dragHandle.className = "fas fa-grip-vertical folder-drag-handle";
-      folderItem.appendChild(dragHandle);
-    }
 
     const folderName = document.createElement("span");
     folderName.className = "folder-name";
@@ -255,10 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
     folderItem.appendChild(folderCount);
     folderList.appendChild(folderItem);
 
-    // Click on folder to filter prompts
+    // Click on folder to filter prompts by that folder
     folderItem.addEventListener("click", () => {
-      folderFilter.value = folder.id;
-      folderFilter.dispatchEvent(new Event("change"));
+      displayPromptsByFolder(folder.id);
       
       // Switch to prompts tab
       document.querySelector('.tab[data-tab="prompts"]').click();
@@ -267,20 +216,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Delete folder
   function deleteFolder(folderId) {
-    if (confirm("Delete this folder? Prompts will be moved to Default folder.")) {
-      // Move prompts to default folder
-      prompts = prompts.map(prompt => {
-        if (prompt.folderId === folderId) {
-          return {...prompt, folderId: "default"};
-        }
-        return prompt;
-      });
-      
-      // Remove folder
+    // Can't delete default folder
+    if (folderId === "default") {
+      showNotification("Cannot delete the Default folder", "error");
+      return;
+    }
+    
+    // Check if folder contains prompts
+    const hasPrompts = prompts.some(prompt => prompt.folderId === folderId);
+    
+    if (hasPrompts) {
+      if (confirm("Delete this folder? Prompts will be moved to Default folder.")) {
+        // Move prompts to default folder
+        prompts = prompts.map(prompt => {
+          if (prompt.folderId === folderId) {
+            return {...prompt, folderId: "default"};
+          }
+          return prompt;
+        });
+        
+        // Remove folder
+        folders = folders.filter(folder => folder.id !== folderId);
+        
+        // Update UI and storage
+        savePrompts();
+        saveFolders();
+        refreshUI();
+        showNotification("Folder deleted", "success");
+      }
+    } else {
+      // If no prompts, just delete it without asking
       folders = folders.filter(folder => folder.id !== folderId);
-      
-      // Update UI and storage
-      savePrompts();
       saveFolders();
       refreshUI();
       showNotification("Folder deleted", "success");
@@ -292,35 +258,20 @@ document.addEventListener("DOMContentLoaded", () => {
     return prompts.filter(prompt => prompt.folderId === folderId).length;
   }
 
-  // Update folder selects
-  function updateFolderSelects() {
-    // Clear options first (except All Folders for filter)
-    while (promptFolderSelect.options.length > 0) {
-      promptFolderSelect.options.remove(0);
-    }
+  // Display prompts filtered by folder
+  function displayPromptsByFolder(folderId) {
+    promptList.innerHTML = "";
     
-    while (folderFilter.options.length > 0) {
-      folderFilter.options.remove(0);
-    }
+    // Get prompts in the folder
+    const folderPrompts = prompts.filter(prompt => 
+      folderId === "all" || prompt.folderId === folderId
+    );
     
-    // Add All Folders option to filter
-    const allOption = document.createElement("option");
-    allOption.value = "all";
-    allOption.textContent = "All Folders";
-    folderFilter.appendChild(allOption);
+    // Sort by newest first
+    const sortedPrompts = [...folderPrompts].sort((a, b) => b.createdAt - a.createdAt);
     
-    // Add folder options
-    folders.forEach(folder => {
-      const option1 = document.createElement("option");
-      option1.value = folder.id;
-      option1.textContent = folder.name;
-      promptFolderSelect.appendChild(option1);
-      
-      const option2 = document.createElement("option");
-      option2.value = folder.id;
-      option2.textContent = folder.name;
-      folderFilter.appendChild(option2);
-    });
+    // Render prompts
+    sortedPrompts.forEach(prompt => createPromptElement(prompt));
   }
 
   // =====================
@@ -328,567 +279,544 @@ document.addEventListener("DOMContentLoaded", () => {
   // =====================
   
   // Add prompt button
-  addPromptButton.addEventListener("click", function () {
-    const promptName = promptNameInput.value.trim();
-    const promptText = promptInput.value.trim();
-    const folderId = promptFolderSelect.value;
-
-    if (promptName === "" || promptText === "") {
-      showNotification("Please enter both a name and prompt text", "error");
+  addPromptButton.addEventListener("click", addPrompt);
+  
+  // Add prompt function
+  function addPrompt() {
+    const name = promptNameInput.value.trim();
+    const text = promptInput.value.trim();
+    // Always use default folder
+    const folderId = "default";
+    
+    if (!name || !text) {
+      showNotification("Please enter a name and text for your prompt", "error");
       return;
     }
-
-    if (prompts.length >= 50) {
-      showNotification("Maximum 50 prompts allowed", "error");
+    
+    const maxPrompts = 50;
+    if (prompts.length >= maxPrompts) {
+      showNotification(`You've reached the maximum of ${maxPrompts} prompts`, "error");
       return;
     }
-
+    
+    const promptId = Date.now().toString();
     const newPrompt = {
-      id: nextPromptId++,
-      name: promptName,
-      text: promptText,
+      id: promptId,
+      name: name,
+      text: text,
       folderId: folderId,
       createdAt: Date.now(),
       usageCount: 0
     };
-
+    
     prompts.push(newPrompt);
     savePrompts();
-    saveNextId();
-    refreshUI();
     
+    // Clear inputs
     promptNameInput.value = "";
     promptInput.value = "";
     
-    showNotification("Prompt added", "success");
-  });
-
+    // Update UI
+    createPromptElement(newPrompt);
+    updatePromptCount();
+    refreshFolderCounts();
+    
+    showNotification("Prompt added successfully", "success");
+  }
+  
   // Create prompt element
   function createPromptElement(prompt) {
     const folder = folders.find(f => f.id === prompt.folderId) || folders[0];
     
-    const promptItem = document.createElement("div");
-    promptItem.className = "promptItem";
-    promptItem.dataset.id = prompt.id;
-    promptItem.dataset.folder = prompt.folderId;
-    promptItem.style.borderLeftColor = folder.color;
-
-    // Add drag handle for reordering
-    const dragHandle = document.createElement("i");
-    dragHandle.className = "fas fa-grip-vertical prompt-drag-handle";
-    promptItem.appendChild(dragHandle);
-
+    const promptElement = document.createElement("div");
+    promptElement.className = "promptItem";
+    promptElement.dataset.id = prompt.id;
+    promptElement.style.borderLeftColor = folder.color;
+    
     const promptHeader = document.createElement("div");
     promptHeader.className = "prompt-header";
     
-    const promptNameElement = document.createElement("div");
-    promptNameElement.textContent = prompt.name;
-    promptNameElement.className = "promptName";
+    const promptName = document.createElement("span");
+    promptName.className = "promptName";
+    promptName.textContent = prompt.name;
     
     const folderBadge = document.createElement("span");
     folderBadge.className = "folder-badge";
-    folderBadge.textContent = folder.name;
     folderBadge.style.backgroundColor = folder.color;
+    folderBadge.textContent = folder.name;
     
-    promptHeader.appendChild(promptNameElement);
+    promptHeader.appendChild(promptName);
     promptHeader.appendChild(folderBadge);
-
-    const promptTextElement = document.createElement("div");
-    promptTextElement.textContent = prompt.text;
-    promptTextElement.className = "promptText";
-
+    
+    const promptText = document.createElement("div");
+    promptText.className = "promptText";
+    promptText.textContent = prompt.text;
+    
     const buttonContainer = document.createElement("div");
     buttonContainer.className = "prompt-buttons";
-
-    const copyButton = createButton('<i class="fas fa-copy"></i>', "copyButton", () => {
-      copyToClipboard(prompt.text);
-      // Increment usage count when copied
-      prompt.usageCount = (prompt.usageCount || 0) + 1;
-      savePrompts();
-    });
     
-    const editButton = createButton('<i class="fas fa-edit"></i>', "editButton", () => {
-      editPrompt(prompt);
-    });
+    // Copy button
+    const copyButton = document.createElement("button");
+    copyButton.className = "copyButton";
+    copyButton.title = "Copy Prompt";
+    copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+    copyButton.addEventListener("click", () => copyPrompt(prompt));
     
-    const folderButton = createButton('<i class="fas fa-folder"></i>', "folderButton", () => {
-      showFolderMenu(prompt, folderButton);
-    });
+    // Edit button
+    const editButton = document.createElement("button");
+    editButton.className = "editButton";
+    editButton.title = "Edit Prompt";
+    editButton.innerHTML = '<i class="fas fa-edit"></i>';
+    editButton.addEventListener("click", () => editPrompt(prompt));
     
-    const deleteButton = createButton('<i class="fas fa-trash"></i>', "deleteButton", () => {
-      deletePrompt(prompt.id);
-    });
-
-    buttonContainer.append(copyButton, editButton, folderButton, deleteButton);
-    promptItem.append(promptHeader, promptTextElement, buttonContainer);
+    // Change folder button
+    const folderButton = document.createElement("button");
+    folderButton.className = "folderButton";
+    folderButton.title = "Change Folder";
+    folderButton.innerHTML = '<i class="fas fa-folder"></i>';
+    folderButton.addEventListener("click", (e) => showFolderMenu(e, prompt));
     
-    // Add to the prompt list
-    promptList.appendChild(promptItem);
+    // Delete button
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "deleteButton";
+    deleteButton.title = "Delete Prompt";
+    deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+    deleteButton.addEventListener("click", () => deletePrompt(prompt.id));
     
-    return promptItem;
+    buttonContainer.appendChild(copyButton);
+    buttonContainer.appendChild(editButton);
+    buttonContainer.appendChild(folderButton);
+    buttonContainer.appendChild(deleteButton);
+    
+    promptElement.appendChild(promptHeader);
+    promptElement.appendChild(promptText);
+    promptElement.appendChild(buttonContainer);
+    
+    // Add to list or replace existing
+    const existingPrompt = document.querySelector(`.promptItem[data-id="${prompt.id}"]`);
+    if (existingPrompt) {
+      existingPrompt.replaceWith(promptElement);
+    } else {
+      promptList.prepend(promptElement);
+    }
+    
+    return promptElement;
   }
-
-  // Create button helper
-  function createButton(html, className, clickHandler) {
-    const button = document.createElement("button");
-    button.innerHTML = html;
-    button.className = className;
-    if (clickHandler) button.addEventListener("click", clickHandler);
-    return button;
-  }
-
-  // Edit prompt
-  function editPrompt(prompt) {
-    const newName = prompt.name;
-    const newText = prompt.text;
+  
+  // Show folder menu for changing prompt folder
+  function showFolderMenu(event, prompt) {
+    event.stopPropagation();
     
-    // Create modal for editing
-    const modal = document.createElement("div");
-    modal.className = "edit-modal";
+    // Remove any existing menus
+    const existingMenu = document.querySelector('.folder-menu');
+    if (existingMenu) {
+      existingMenu.remove();
+    }
     
-    const modalContent = document.createElement("div");
-    modalContent.className = "edit-modal-content";
+    // Create menu
+    const menu = document.createElement('div');
+    menu.className = 'folder-menu';
     
-    const modalHeader = document.createElement("div");
-    modalHeader.className = "edit-modal-header";
-    modalHeader.textContent = "Edit Prompt";
-    
-    const closeBtn = document.createElement("span");
-    closeBtn.className = "close-modal";
-    closeBtn.textContent = "×";
-    closeBtn.onclick = () => modal.remove();
-    
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.value = newName;
-    nameInput.placeholder = "Prompt name";
-    
-    const textArea = document.createElement("textarea");
-    textArea.value = newText;
-    textArea.placeholder = "Prompt text";
-    textArea.rows = 5;
-    
-    // Add folder select in the edit modal
-    const folderSelect = document.createElement("select");
+    // Add header
+    const header = document.createElement('div');
+    header.className = 'folder-menu-header';
+    header.textContent = 'Move to folder:';
+    menu.appendChild(header);
     
     // Add folder options
     folders.forEach(folder => {
-      const option = document.createElement("option");
-      option.value = folder.id;
-      option.textContent = folder.name;
-      if (folder.id === prompt.folderId) {
-        option.selected = true;
+      const item = document.createElement('div');
+      item.className = 'folder-menu-item';
+      if (prompt.folderId === folder.id) {
+        item.classList.add('active');
       }
-      folderSelect.appendChild(option);
+      
+      const colorDot = document.createElement('span');
+      colorDot.className = 'color-dot';
+      colorDot.style.backgroundColor = folder.color;
+      
+      const folderName = document.createElement('span');
+      folderName.textContent = folder.name;
+      
+      item.appendChild(colorDot);
+      item.appendChild(folderName);
+      
+      item.addEventListener('click', () => {
+        changePromptFolder(prompt.id, folder.id);
+        menu.remove();
+      });
+      
+      menu.appendChild(item);
     });
     
-    const saveBtn = document.createElement("button");
-    saveBtn.textContent = "Save Changes";
-    saveBtn.onclick = () => {
-      if (nameInput.value.trim() === "" || textArea.value.trim() === "") {
-        showNotification("Please enter both a name and prompt text", "error");
+    // Position menu - fix positioning to prevent going offscreen
+    const buttonRect = event.target.closest('button').getBoundingClientRect();
+    const container = document.querySelector('.container');
+    const containerRect = container.getBoundingClientRect();
+    
+    // Add to body to get proper positioning
+    document.body.appendChild(menu);
+    
+    // Calculate position to keep menu visible
+    const menuRect = menu.getBoundingClientRect();
+    let left = buttonRect.left;
+    
+    // Ensure menu doesn't go outside right edge
+    if (left + menuRect.width > containerRect.right) {
+      left = containerRect.right - menuRect.width - 10;
+    }
+    
+    // Ensure menu doesn't go outside bottom edge
+    let top = buttonRect.bottom + 5;
+    if (top + menuRect.height > window.innerHeight) {
+      top = buttonRect.top - menuRect.height - 5;
+    }
+    
+    menu.style.top = `${top}px`;
+    menu.style.left = `${left}px`;
+    
+    // Close when clicking outside
+    document.addEventListener('click', function closeMenu(e) {
+      if (!menu.contains(e.target) && e.target !== event.target) {
+        menu.remove();
+        document.removeEventListener('click', closeMenu);
+      }
+    });
+  }
+  
+  // Change prompt folder
+  function changePromptFolder(promptId, folderId) {
+    const promptIndex = prompts.findIndex(p => p.id === promptId);
+    if (promptIndex !== -1) {
+      prompts[promptIndex].folderId = folderId;
+      savePrompts();
+      refreshUI();
+      
+      const folder = folders.find(f => f.id === folderId);
+      showNotification(`Moved to "${folder.name}" folder`, "success");
+    }
+  }
+  
+  // Copy prompt
+  function copyPrompt(prompt) {
+    navigator.clipboard.writeText(prompt.text).then(() => {
+      // Update usage count
+      const index = prompts.findIndex(p => p.id === prompt.id);
+      if (index !== -1) {
+        prompts[index].usageCount++;
+        savePrompts();
+      }
+      
+      showNotification("Prompt copied to clipboard", "success");
+      
+      // Check if enhancer is enabled and send message
+      chrome.storage.local.get(['enhancerEnabled'], function(result) {
+        if (result.enhancerEnabled) {
+          chrome.runtime.sendMessage({
+            action: "enhancePrompt",
+            prompt: prompt.text
+          });
+        }
+      });
+    }).catch(err => {
+      console.error("Failed to copy: ", err);
+      showNotification("Failed to copy prompt", "error");
+    });
+  }
+  
+  // Edit prompt
+  function editPrompt(prompt) {
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'edit-modal';
+    
+    modal.innerHTML = `
+      <div class="edit-modal-content">
+        <div class="edit-modal-header">
+          <span>Edit Prompt</span>
+          <span class="close-modal">&times;</span>
+        </div>
+        <input type="text" id="editNameInput" placeholder="Prompt Name" value="${escapeHTML(prompt.name)}">
+        <textarea id="editTextInput" placeholder="Prompt Text" rows="5">${escapeHTML(prompt.text)}</textarea>
+        <button id="saveEditButton">Save Changes</button>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Handle close button
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+      modal.remove();
+    });
+    
+    // Handle click outside
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+    
+    // Handle save button
+    modal.querySelector('#saveEditButton').addEventListener('click', () => {
+      const newName = document.getElementById('editNameInput').value.trim();
+      const newText = document.getElementById('editTextInput').value.trim();
+      
+      if (!newName || !newText) {
+        showNotification("Name and text are required", "error");
         return;
       }
       
       // Update prompt
-      prompt.name = nameInput.value.trim();
-      prompt.text = textArea.value.trim();
-      prompt.folderId = folderSelect.value; // Update folder
-      
-      // Update storage and UI
-      savePrompts();
-      refreshUI();
-      
-      // Close modal
-      modal.remove();
-      showNotification("Prompt updated", "success");
-    };
-    
-    modalHeader.appendChild(closeBtn);
-    modalContent.appendChild(modalHeader);
-    modalContent.appendChild(nameInput);
-    modalContent.appendChild(textArea);
-    modalContent.appendChild(folderSelect);
-    modalContent.appendChild(saveBtn);
-    modal.appendChild(modalContent);
-    
-    document.body.appendChild(modal);
+      const index = prompts.findIndex(p => p.id === prompt.id);
+      if (index !== -1) {
+        prompts[index] = {
+          ...prompts[index],
+          name: newName,
+          text: newText
+        };
+        
+        savePrompts();
+        
+        // Update UI without full refresh
+        const promptElement = document.querySelector(`.promptItem[data-id="${prompt.id}"]`);
+        if (promptElement) {
+          // Update name and text in the UI
+          promptElement.querySelector('.promptName').textContent = newName;
+          promptElement.querySelector('.promptText').textContent = newText;
+        }
+        
+        modal.remove();
+        showNotification("Prompt updated successfully", "success");
+      }
+    });
   }
-
+  
   // Delete prompt
   function deletePrompt(promptId) {
-    if (confirm("Delete this prompt?")) {
+    const promptElement = document.querySelector(`.promptItem[data-id="${promptId}"]`);
+    if (!promptElement) return;
+    
+    if (confirm("Are you sure you want to delete this prompt?")) {
+      // Remove from array
       prompts = prompts.filter(p => p.id !== promptId);
+      
+      // Save to storage
       savePrompts();
-      refreshUI();
+      
+      // Remove from UI
+      promptElement.remove();
+      
+      // Update counts
+      updatePromptCount();
+      refreshFolderCounts();
+      
       showNotification("Prompt deleted", "success");
     }
   }
-
-  // Show folder menu for moving prompts
-  function showFolderMenu(prompt, buttonElement) {
-    // Remove any existing menu
-    const existingMenu = document.querySelector(".folder-menu");
-    if (existingMenu) existingMenu.remove();
-    
-    // Create menu
-    const menu = document.createElement("div");
-    menu.className = "folder-menu";
-    
-    // Header
-    const header = document.createElement("div");
-    header.textContent = "Move to folder:";
-    header.className = "folder-menu-header";
-    menu.appendChild(header);
-    
-    // Folder options
-    folders.forEach(folder => {
-      const option = document.createElement("div");
-      option.className = "folder-menu-item";
-      if (folder.id === prompt.folderId) {
-        option.classList.add("active");
-      }
-      
-      const colorDot = document.createElement("span");
-      colorDot.className = "color-dot";
-      colorDot.style.backgroundColor = folder.color;
-      
-      const name = document.createElement("span");
-      name.textContent = folder.name;
-      
-      option.appendChild(colorDot);
-      option.appendChild(name);
-      menu.appendChild(option);
-      
-      option.addEventListener("click", () => {
-        // Move prompt to selected folder
-        const oldFolderId = prompt.folderId;
-        prompt.folderId = folder.id;
-        savePrompts();
-        
-        // Only refresh UI if we're not currently filtering
-        // Otherwise, just update this prompt item
-        if (folderFilter.value === "all" || folderFilter.value === folder.id) {
-          const promptItem = document.querySelector(`.promptItem[data-id="${prompt.id}"]`);
-          if (promptItem) {
-            // Update folder color and badge
-            promptItem.style.borderLeftColor = folder.color;
-            promptItem.dataset.folder = folder.id;
-            const folderBadge = promptItem.querySelector(".folder-badge");
-            if (folderBadge) {
-              folderBadge.textContent = folder.name;
-              folderBadge.style.backgroundColor = folder.color;
-            }
-          }
-          
-          // Update folder counts
-          updateFolderCounts();
-        } else {
-          // If we're filtering and moved to a different folder, refresh completely
-          refreshUI();
-        }
-        
-        menu.remove();
-        showNotification(`Moved to ${folder.name}`, "success");
-      });
-    });
-    
-    // Position and show menu
-    const rect = buttonElement.getBoundingClientRect();
-    menu.style.top = `${rect.bottom + 5}px`;
-    menu.style.left = `${rect.left}px`;
-    
-    document.body.appendChild(menu);
-    
-    // Close menu when clicking outside
-    document.addEventListener("click", function closeMenu(e) {
-      if (!menu.contains(e.target) && e.target !== buttonElement) {
-        menu.remove();
-        document.removeEventListener("click", closeMenu);
-      }
-    });
-  }
-
-  // Clipboard and notification
-  function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      showNotification("Prompt copied", "success");
-    });
-  }
-
-  function showNotification(message, type = "") {
-    const notification = document.createElement("div");
-    notification.className = "notification";
-    if (type) {
-      notification.classList.add(type);
-    }
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.classList.add("show");
-      setTimeout(() => {
-        notification.classList.remove("show");
-        setTimeout(() => notification.remove(), 300);
-      }, 2000);
-    }, 10);
-  }
-
+  
   // =====================
-  // Search, Filter & Sort
+  // Import/Export
   // =====================
   
-  // Search functionality
-  searchInput.addEventListener("input", filterPrompts);
-  folderFilter.addEventListener("change", filterPrompts);
-  
-  // Sort functionality
-  sortSelect.addEventListener("change", () => {
-    sortPrompts();
-    refreshUI();
-  });
-  
-  function sortPrompts() {
-    const sortType = sortSelect.value;
-    
-    switch (sortType) {
-      case "newest":
-        prompts.sort((a, b) => b.createdAt - a.createdAt);
-        break;
-      case "oldest":
-        prompts.sort((a, b) => a.createdAt - b.createdAt);
-        break;
-      case "name":
-        prompts.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "nameDesc":
-        prompts.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case "mostUsed":
-        prompts.sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0));
-        break;
-      case "folder":
-        prompts.sort((a, b) => {
-          const folderA = folders.find(f => f.id === a.folderId);
-          const folderB = folders.find(f => f.id === b.folderId);
-          const folderNameA = folderA ? folderA.name : "Default";
-          const folderNameB = folderB ? folderB.name : "Default";
-          return folderNameA.localeCompare(folderNameB);
-        });
-        break;
-    }
-  }
-  
-  function filterPrompts() {
-    const searchTerm = searchInput.value.trim().toLowerCase();
-    const folderValue = folderFilter.value;
-    const promptItems = promptList.querySelectorAll(".promptItem");
-    
-    promptItems.forEach(item => {
-      const promptName = item.querySelector(".promptName").textContent.toLowerCase();
-      const promptText = item.querySelector(".promptText").textContent.toLowerCase();
-      const promptFolder = item.dataset.folder;
-      
-      const matchesSearch = !searchTerm || 
-                          promptName.includes(searchTerm) || 
-                          promptText.includes(searchTerm);
-                          
-      const matchesFolder = folderValue === "all" || promptFolder === folderValue;
-      
-      item.style.display = (matchesSearch && matchesFolder) ? "block" : "none";
-    });
-  }
-
-  // =====================
-  // Data Management
-  // =====================
-  
-  // Save to local storage
-  function savePrompts() {
-    localStorage.setItem("prompts", JSON.stringify(prompts));
-  }
-  
-  function saveFolders() {
-    localStorage.setItem("folders", JSON.stringify(folders));
-  }
-  
-  function saveNextId() {
-    localStorage.setItem("nextPromptId", nextPromptId.toString());
-  }
-
-  // Load from local storage
-  function loadData() {
-    // Load prompts
-    const savedPrompts = JSON.parse(localStorage.getItem("prompts")) || [];
-    // Add usageCount if it doesn't exist
-    prompts = savedPrompts.map(p => ({ ...p, usageCount: p.usageCount || 0 }));
-    
-    // Load folders
-    const savedFolders = JSON.parse(localStorage.getItem("folders")) || [];
-    // Ensure default folder exists
-    if (savedFolders.length === 0 || !savedFolders.some(f => f.id === "default")) {
-      savedFolders.unshift({ id: "default", name: "Default", color: "#808080" });
-    }
-    folders = savedFolders;
-    
-    // Load next ID
-    nextPromptId = parseInt(localStorage.getItem("nextPromptId") || "1");
-    
-    // Load social links
-    loadSocialLinks();
-    
-    refreshUI();
-  }
-
   // Export data
   exportDataBtn.addEventListener("click", () => {
-    // Get social links from storage first
-    chrome.storage.local.get(['socialLinks', 'enhancerEnabled'], function(result) {
-      const data = {
-        prompts,
-        folders,
-        nextPromptId,
-        socialLinks: result.socialLinks || socialLinks,
-        enhancerEnabled: result.enhancerEnabled === undefined ? true : result.enhancerEnabled
-      };
-      
-      const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `promptify_backup_${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      
-      URL.revokeObjectURL(url);
-      showNotification("Data exported", "success");
-    });
+    const data = {
+      prompts: prompts,
+      folders: folders,
+      socialLinks: socialLinks
+    };
+    
+    const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `promptify_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+    showNotification("Data exported successfully", "success");
   });
-
-  // Import data
+  
+  // Import button
   importDataBtn.addEventListener("click", () => {
     importFileInput.click();
   });
   
-  importFileInput.addEventListener("change", (event) => {
-    const file = event.target.files[0];
+  // Import data
+  importFileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
     if (!file) return;
     
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = (event) => {
       try {
-        const data = JSON.parse(e.target.result);
+        const importedData = JSON.parse(event.target.result);
         
-        if (data.prompts && data.folders) {
-          if (confirm("This will replace all your current data. Continue?")) {
-            prompts = data.prompts;
-            folders = data.folders;
-            nextPromptId = data.nextPromptId || 1;
-            
-            // Also import social links and enhancer setting if available
-            if (data.socialLinks) {
-              socialLinks = data.socialLinks;
-              chrome.storage.local.set({ socialLinks: socialLinks });
-            }
-            
-            if (data.enhancerEnabled !== undefined) {
-              chrome.storage.local.set({ enhancerEnabled: data.enhancerEnabled });
-              enableEnhancerToggle.checked = data.enhancerEnabled;
-            }
-            
-            savePrompts();
-            saveFolders();
-            saveNextId();
-            refreshUI();
-            loadSocialLinks();
-            
-            showNotification("Data imported successfully", "success");
-          }
-        } else {
-          showNotification("Invalid backup file", "error");
+        if (importedData.prompts && Array.isArray(importedData.prompts)) {
+          prompts = importedData.prompts;
         }
+        
+        if (importedData.folders && Array.isArray(importedData.folders)) {
+          // Ensure default folder exists
+          if (!importedData.folders.some(f => f.id === "default")) {
+            importedData.folders.unshift({ id: "default", name: "Default", color: "#808080" });
+          }
+          folders = importedData.folders;
+        }
+        
+        if (importedData.socialLinks) {
+          socialLinks = importedData.socialLinks;
+          loadSocialLinks();
+        }
+        
+        savePrompts();
+        saveFolders();
+        refreshUI();
+        showNotification("Data imported successfully", "success");
       } catch (error) {
-        showNotification("Error importing data", "error");
-        console.error(error);
+        console.error("Import error:", error);
+        showNotification("Failed to import data", "error");
       }
     };
     
     reader.readAsText(file);
-    event.target.value = null;
+    e.target.value = ''; // Reset file input
   });
-
+  
   // =====================
-  // UI Updates
+  // Helpers
   // =====================
   
-  // Update prompt count display
+  // Update prompt count
   function updatePromptCount() {
-    promptCountDisplay.textContent = prompts.length;
+    const count = prompts.length;
+    const maxPrompts = 50;
+    promptCountDisplay.textContent = count;
     
-    // Update button state
-    if (prompts.length >= 50) {
-      addPromptButton.disabled = true;
+    // Disable add button if limit reached
+    if (count >= maxPrompts) {
       addPromptButton.classList.add("disabled");
+      addPromptButton.disabled = true;
     } else {
-      addPromptButton.disabled = false;
       addPromptButton.classList.remove("disabled");
+      addPromptButton.disabled = false;
     }
   }
   
-  // Update folder counts
-  function updateFolderCounts() {
-    folders.forEach(folder => {
-      const count = countPromptsInFolder(folder.id);
-      const folderElement = document.querySelector(`.folder-item[data-folder="${folder.id}"] .folder-count`);
-      if (folderElement) {
-        folderElement.textContent = count;
-      }
-    });
-  }
-
-  // Refresh the entire UI
+  // Refresh the UI
   function refreshUI() {
-    // Clear UI
+    // Clear existing elements
     promptList.innerHTML = "";
     folderList.innerHTML = "";
     
-    // Sort prompts based on selected option
-    sortPrompts();
+    // Rebuild UI elements
+    folders.forEach(folder => createFolderElement(folder));
     
-    // Add default folder always first
-    const defaultFolder = folders.find(f => f.id === "default");
-    if (defaultFolder) {
-      createFolderElement(defaultFolder);
+    // Show all prompts sorted by newest
+    const sortedPrompts = [...prompts].sort((a, b) => b.createdAt - a.createdAt);
+    sortedPrompts.forEach(prompt => createPromptElement(prompt));
+    
+    updatePromptCount();
+    refreshFolderCounts();
+  }
+  
+  // Update folder counts
+  function refreshFolderCounts() {
+    document.querySelectorAll('.folder-item').forEach(item => {
+      const folderId = item.dataset.folder;
+      const count = countPromptsInFolder(folderId);
+      item.querySelector('.folder-count').textContent = count;
+    });
+  }
+  
+  // Show notification
+  function showNotification(message, type = "info") {
+    // Remove existing notification
+    const existingNotification = document.querySelector(".notification");
+    if (existingNotification) {
+      existingNotification.remove();
     }
     
-    // Add other folders
-    folders
-      .filter(f => f.id !== "default")
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .forEach(folder => createFolderElement(folder));
+    // Create notification element
+    const notification = document.createElement("div");
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
     
-    // Add prompts
-    prompts.forEach(prompt => createPromptElement(prompt));
+    // Add to body
+    document.body.appendChild(notification);
     
-    // Update selects
-    updateFolderSelects();
+    // Animate in
+    setTimeout(() => {
+      notification.classList.add("show");
+    }, 10);
     
-    // Update counts
-    updatePromptCount();
-    
-    // Apply current filter
-    filterPrompts();
-    
-    // Initialize drag and drop
-    initSortable();
+    // Remove after delay
+    setTimeout(() => {
+      notification.classList.remove("show");
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 2000);
   }
-
-  // Initialize the extension
-  loadData();
   
-  // Initial UI setup
-  updatePromptCount();
-  // Select first color option
-  colorOptions[0].click();
+  // Save prompts to storage
+  function savePrompts() {
+    chrome.storage.local.set({ prompts: prompts });
+  }
+  
+  // Save folders to storage
+  function saveFolders() {
+    chrome.storage.local.set({ folders: folders });
+  }
+  
+  // Escape HTML to prevent XSS
+  function escapeHTML(str) {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+  
+  // =====================
+  // Initialize
+  // =====================
+  
+  // Load data from storage
+  function loadData() {
+    chrome.storage.local.get(['prompts', 'folders', 'socialLinks'], function(result) {
+      // Load prompts
+      if (result.prompts && Array.isArray(result.prompts)) {
+        prompts = result.prompts;
+      }
+      
+      // Load folders
+      if (result.folders && Array.isArray(result.folders)) {
+        folders = result.folders;
+      } else {
+        // Initialize with default folder
+        saveFolders();
+      }
+      
+      // Load social links
+      if (result.socialLinks) {
+        socialLinks = result.socialLinks;
+      }
+      
+      // Initialize UI
+      refreshUI();
+      loadSocialLinks();
+      addCopyButtonsToSocialLinks();
+      
+      // Set initial selected color
+      if (colorOptions.length > 0) {
+        colorOptions[0].click();
+      }
+    });
+  }
+  
+  // Initialize app
+  loadData();
 });

@@ -28,29 +28,6 @@
 
         <!-- Prompts Tab -->
         <div class="tab-content active" id="prompts-tab">
-          <div class="search-wrapper">
-            <input
-              placeholder="Search Prompts 🔎"
-              type="search"
-              id="search"
-              data-search
-            />
-            <select id="folderFilter">
-              <option value="all">All Folders</option>
-            </select>
-          </div>
-          
-          <div class="sort-controls">
-            <select id="sortSelect">
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name">Name (A-Z)</option>
-              <option value="nameDesc">Name (Z-A)</option>
-              <option value="mostUsed">Most Used</option>
-              <option value="folder">By Folder</option>
-            </select>
-          </div>
-          
           <div id="promptContainer">
             <input
               type="text"
@@ -63,9 +40,6 @@
               rows="3"
             ></textarea>
             <div class="prompt-options">
-              <select id="promptFolderSelect">
-                <option value="default">Default</option>
-              </select>
               <button type="button" class="addPrompt" id="addPromptButton">
                 Add Prompt
               </button>

@@ -2,8 +2,8 @@
   "update_url": "https://clients2.google.com/service/update2/crx",
   "manifest_version": 3,
   "name": "Promptify - Prompt Manager & Enhancer",
-  "version": "4.0.0",
-  "description": "Store, categorize, and improve your prompts for ChatGPT, Claude, Perplexity, and more. Up to 50 custom prompts with folder organization.",
+  "version": "3.3.3",
+  "description": "Store, categorize, and improve your prompts. Up to 50 custom prompts with folder organization.",
   "permissions": ["storage", "activeTab", "declarativeNetRequest"],
   "host_permissions": [
     "https://chat.openai.com/*",
