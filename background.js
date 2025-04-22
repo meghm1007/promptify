@@ -1,15 +1,12 @@
 // Background Service Worker for Promptify
 
 // Gemini API integration for prompt enhancement
-const fineif = "AIzaS";
-const feifjie = "yAunW";
-const igjeijgieji = "EMMyIBuovYeuF";
-const wfifeijfe = "CScx7udLA6x3iS2o";
-const ifsjowfjwifnwfwfiwniwn = fineif + feifjie + igjeijgieji + wfifeijfe;
+
+const gemini_api_key = "";
 
 function callGeminiAPI(systemInstruction, prompt) {
   console.log("Calling Gemini API with prompt:", prompt);
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${ifsjowfjwifnwfwfiwniwn}`;
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${gemini_api_key}`;
 
   const data = {
     contents: [
